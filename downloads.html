@@ -1,29 +1,83 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset='utf-8'>
-		<meta http-equiv="X-UA-Compatible" content="chrome=1">
-		<link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-		<link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-		<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-		<script type="text/javascript" src="javascripts/main.js"></script>
-		<script>printFavicon();</script>
-		<!--[if lt IE 9]>
-		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-		<title>Home - Sagittarius Wiki</title>
-	</head>
-	<body>
-		<div id="container">
-			<div class="inner">
-				<script>printHeader("Downloads");</script>
-				<hr>
-				<section id="main_content">
-					<p>Coming soon!!!</p>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Downloads - Sagittarius Wiki</title>
+	<script src="js/main.js"></script>
+	<script>printFavicon();</script>
+
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<link href="css/bootstrap-responsive.css" rel="stylesheet" />
+	<link href="css/docs.css" rel="stylesheet" />
+	<link href="css/prettify.css" rel="stylesheet" />
+
+	<!--[if lt IE 9]>
+		<script src="js/html5shiv.js"></script>
+	<![endif]-->
+</head>
+<body data-spy="scroll" data-target=".bs-docs-sidebar">
+	<script>printNav("Downloads");</script>
+
+	<header class="jumbotron subhead" id="overview">
+		<div class="container">
+			<h1>Downloads</h1>
+			<p class="lead">Get the latest version of Sagittarius, or browse past releases</p>
+		</div>
+	</header>
+
+	<div class="container">
+		<div class="row">
+			<div class="span3 bs-docs-sidebar">
+				<ul class="nav nav-list bs-docs-sidenav">
+					<li><a href="#recommended"><i class="icon-chevron-right"></i>Recommended</a></li>
+					<li><a href="#bleeding-edge"><i class="icon-chevron-right"></i>Bleeding Edge</a></li>
+					<li><a href="#past-releases"><i class="icon-chevron-right"></i>Past Releases</a></li>
+					<li><a href="#deprecated"><i class="icon-chevron-right"></i>Deprecated</a></li>
+				</ul>
+			</div>
+			<div class="span9">
+
+				<section id="recommended">
+					<div class="page-header">
+						<h1>Recommended</h1>
+					</div>
+					<p class="lead">Coming soon!</p>
 				</section>
-				<script>printFooter();</script>
+
+				<section id="bleeding-edge">
+					<div class="page-header">
+						<h1>Bleeding Edge</h1>
+					</div>
+					<div class="alert alert-info"><h4>The most up-to-date version that has been pushed to the GitHub repository. This is not recommended for production or commercial use as it may be unstable.</h4></div>
+					<p class="lead">Coming soon!</p>
+				</section>
+
+				<section id="past-releases">
+					<div class="page-header">
+						<h1>Past Releases</h1>
+					</div>
+					<div class="alert alert-info"><h4>These versions are old, but still supported and available for download. Please note that not all features available in newer versions of Sagittarius may be included in these releases.</h4></div>
+					<p class="lead">None yet.</p>
+				</section>
+
+				<section id="deprecated">
+					<div class="page-header">
+						<h1>Deprecated</h1>
+					</div>
+					<div class="alert alert-info"><h4>These versions are no longer supported, but remain here for reference.</h4></div>
+					<p class="lead">None yet.</p>
+				</section>
+
 			</div>
 		</div>
-	</body>
+	</div>
+
+	<script>printFooter();</script>
+
+	<script src="js/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/holder.js"></script>
+	<script src="js/prettify.js"></script>
+	<script src="js/application.js"></script>
+</body>
 </html>

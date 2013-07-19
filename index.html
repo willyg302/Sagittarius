@@ -1,40 +1,95 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset='utf-8'>
-		<meta http-equiv="X-UA-Compatible" content="chrome=1">
-		<link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-		<link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-		<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-		<script type="text/javascript" src="javascripts/main.js"></script>
-		<script>printFavicon();</script>
-		<!--[if lt IE 9]>
-		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-		<title>Home - Sagittarius Wiki</title>
-	</head>
-	<body>
-		<div id="container">
-			<div class="inner">
-				<script>printHeader("Home");</script>
-				<section id="downloads" class="clearfix">
-					<a href="https://github.com/willyg302/Sagittarius/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-					<a href="https://github.com/willyg302/Sagittarius/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-					<a href="https://github.com/willyg302/Sagittarius" id="view-on-github" class="button"><span>View on GitHub</span></a>
-				</section>
-				<hr>
-				<section id="main_content">
-					<h3><a name="welcome-to-the-wiki" class="anchor" href="#welcome-to-the-wiki"><span class="octicon octicon-link"></span></a>Welcome to the Wiki!</h3>
-					<p>Browse the table of contents below to get started, or use the quick-links bar above to jump to some of the more important pages. If you would like to view or download the source code of Sagittarius, you can use the buttons above to do so.</p>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Sagittarius Wiki</title>
+	<script src="js/main.js"></script>
+	<script>printFavicon();</script>
 
-					<h3><a name="table-of-contents" class="anchor" href="#table-of-contents"><span class="octicon octicon-link"></span></a>Table of Contents</h3>
-					<ul>
-						<li><a href="getting-started.html">Getting Started</a></li>
-					</ul>
-				</section>
-				<script>printFooter();</script>
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<link href="css/bootstrap-responsive.css" rel="stylesheet" />
+	<link href="css/docs.css" rel="stylesheet" />
+	<link href="css/prettify.css" rel="stylesheet" />
+
+	<!--[if lt IE 9]>
+		<script src="js/html5shiv.js"></script>
+	<![endif]-->
+</head>
+<body data-spy="scroll" data-target=".bs-docs-sidebar">
+	<script>printNav("Home");</script>
+
+	<div class="jumbotron masthead">
+		<div class="container">
+			<img style="margin-bottom:30px;" src="img/sag-logo.png" />
+			<p>
+				<a href="https://github.com/willyg302/Sagittarius/zipball/master" class="btn btn-primary btn-large">Download Sagittarius</a>
+			</p>
+			<ul class="masthead-links">
+				<li><a href="http://github.com/willyg302/Sagittarius">View on GitHub</a></li>
+				<li><a href="http://sagittarius-ogs.appspot.com/">Visit Site</a></li>
+				<li>Version 0.1</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="bs-docs-social">
+		<div class="container">
+			<ul class="bs-docs-social-buttons">
+				<li>
+					<iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=willyg302&repo=Sagittarius&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe>
+				</li>
+				<li>
+					<iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=willyg302&repo=Sagittarius&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="102px" height="20px"></iframe>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="container">
+		<section id="welcome">
+			<div class="page-header">
+				<h1>Welcome!</h1>
+			</div>
+			<p class="lead">Browse the table of contents below to get started, or use the quick-links bar above to jump to some of the more important pages. If you would like to download the source repo of Sagittarius, you can use the big blue button above to do so.</p>
+		</section>
+		<div class="marketing">
+			<div class="row-fluid">
+				<div class="span4">
+					<!--Image sizes are 600x290-->
+					<a href="downloads.html"><img class="marketing-img" src="img/index-download.png" /></a>
+					<h2>Downloads</h2>
+					<p>Grab the latest recommended version, a past stable release, or even the bleeding-edge version if you're feeling particularly dangerous.</p>
+				</div>
+				<div class="span4">
+					<a href="starter-kits.html"><img class="marketing-img" src="img/index-starter-kits.png" /></a>
+					<h2>Starter Kits</h2>
+					<p>Sagittarius offers a number of starter kits to jump-start your game backend. Just pick one in your favorite language and start coding!</p>
+				</div>
+				<div class="span4">
+					<a href="mixed-media.html"><img class="marketing-img" src="img/index-mixed-media.png" /></a>
+					<h2>Mixed Media</h2>
+					<p>Wallpapers, splash screens, intro videos, key sheets, logos in a variety of sizes, &ldquo;Powered By&rdquo; buttons, press and citation information, and more!</p>
+				</div>
 			</div>
 		</div>
-	</body>
+
+		<section id="table-of-contents">
+			<div class="page-header">
+				<h1>Table of Contents</h1>
+			</div>
+			<ul>
+				<li><a href="getting-started.html">Getting Started</a></li>
+				<li><a href="wizard.html">Sagittarius Wizard</a></li>
+			</ul>
+		</section>
+	</div>
+
+	<script>printFooter();</script>
+
+	<script src="js/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/holder.js"></script>
+	<script src="js/prettify.js"></script>
+	<script src="js/application.js"></script>
+</body>
 </html>

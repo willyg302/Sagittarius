@@ -1,54 +1,189 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset='utf-8'>
-		<meta http-equiv="X-UA-Compatible" content="chrome=1">
-		<link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-		<link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-		<link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-		<script type="text/javascript" src="javascripts/main.js"></script>
-		<script>printFavicon();</script>
-		<!--[if lt IE 9]>
-		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-		<![endif]-->
-		<title>Getting Started - Sagittarius Wiki</title>
-	</head>
-	<body>
-		<div id="container">
-			<div class="inner">
-				<script>printHeader("Getting Started");</script>
-				<hr>
-				<section id="main_content">
-					<h3><a name="app-engine-account" class="anchor" href="#app-engine-account"><span class="octicon octicon-link"></span></a>App Engine Account</h3>
-					<p>First, create a Google App Engine account by going to the <a href="https://developers.google.com/appengine/">App Engine homepage</a> and clicking "Sign Up". This will be linked to your Google account for all of Google's services (such as Gmail and Google+), so if you do not already have a Google account you may need to create one as well. Wait until your App Engine account is verified before continuing.</p>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Getting Started - Sagittarius Wiki</title>
+	<script src="js/main.js"></script>
+	<script>printFavicon();</script>
 
-					<h3><a name="installing-prerequisites" class="anchor" href="#installing-prerequisites"><span class="octicon octicon-link"></span></a>Installing Prerequisites</h3>
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<link href="css/bootstrap-responsive.css" rel="stylesheet" />
+	<link href="css/docs.css" rel="stylesheet" />
+	<link href="css/prettify.css" rel="stylesheet" />
+
+	<!--[if lt IE 9]>
+		<script src="js/html5shiv.js"></script>
+	<![endif]-->
+</head>
+<body data-spy="scroll" data-target=".bs-docs-sidebar">
+	<script>printNav("Getting Started");</script>
+
+	<header class="jumbotron subhead" id="overview">
+		<div class="container">
+			<h1>Getting Started</h1>
+			<p class="lead">Use this guide to get up and running with Sagittarius</p>
+		</div>
+	</header>
+
+	<div class="container">
+		<div class="row">
+			<div class="span3 bs-docs-sidebar">
+				<ul class="nav nav-list bs-docs-sidenav">
+					<li><a href="#creating-your-application"><i class="icon-chevron-right"></i>Creating Your Application</a></li>
+					<li><a href="#deploying-your-application"><i class="icon-chevron-right"></i>Deploying Your Application</a></li>
+					<li><a href="#project-integration"><i class="icon-chevron-right"></i>Project Integration</a></li>
+					<li><a href="#next-steps"><i class="icon-chevron-right"></i>Next Steps</a></li>
+				</ul>
+			</div>
+			<div class="span9">
+
+				<section id="creating-your-application">
+					<div class="page-header">
+						<h1>Creating Your Application</h1>
+					</div>
+
+					<h2 id="app-engine-account">App Engine Account</h2>
+					<p>First, create a Google App Engine account by going to the <a href="https://developers.google.com/appengine/">App Engine homepage</a> and clicking <strong>Sign Up</strong>. This will be linked to your Google account for all of Google's services (such as Gmail and Google+), so if you do not already have a Google account you may need to create one as well. Wait until your App Engine account is verified before continuing.</p>
+
+					<h2 id="installing-prerequisites">Installing Prerequisites</h2>
 					<p><strong>Python</strong>: You will need Python 2.7 to deploy Sagittarius to Google App Engine. You can get the appropriate version for your OS at the <a href="http://www.python.org/download/releases/2.7/">Python 2.7 download page</a>.</p>
-					<p><strong>Java (Optional)</strong>: The Sagittarius Setup Wizard is a cross-platform Java JAR, which requires a JRE of 1.6 or greater to run. If you would like to use the Setup Wizard, verify that you have Java installed on your machine (for example by using the <a href="http://www.java.com/en/download/testjava.jsp">Java test page</a>). If not, you can download Java <a href="http://java.com/en/download/index.jsp">here</a> or manually deploy Sagittarius.</p>
+					<!--<p><strong>Java (Optional)</strong>: The Sagittarius Setup Wizard is a cross-platform Java JAR, which requires a JRE of 1.6 or greater to run. If you would like to use the Setup Wizard, verify that you have Java installed on your machine (for example by using the <a href="http://www.java.com/en/download/testjava.jsp">Java test page</a>). If not, you can download Java <a href="http://java.com/en/download/index.jsp">here</a> or <a href="#" onclick="document.getElementById('manual-deployment').scrollIntoView(true);return false;">manually deploy Sagittarius</a>.</p>-->
 					<p><strong>App Engine SDK</strong>: Download the appropriate Python version for your OS at the <a href="https://developers.google.com/appengine/downloads#Google_App_Engine_SDK_for_Python">App Engine download page</a>.</p>
 
-					<h3><a name="creating-your-application" class="anchor" href="#creating-your-application"><span class="octicon octicon-link"></span></a>Creating Your Application</h3>
+					<h2 id="application-setup">Application Setup</h2>
 					<p>Log into App Engine and create a new application through the dashboard. You can name this application anything you like -- it's <em>your</em> application for <em>your</em> games, and Sagittarius will only be filling its shoes. Keep note of your app's <code>Application Identifier</code> for later.</p>
 
-					<h3><a name="downloading-sagittarius" class="anchor" href="#downloading-sagittarius"><span class="octicon octicon-link"></span></a>Downloading Sagittarius</h3>
-					<p>Coming soon!!!</p>
-
-					<h3><a name="deploying-your-application" class="anchor" href="#deploying-your-application"><span class="octicon octicon-link"></span></a>Deploying Your Application</h3>
-					<p>The easy way to deploy your app is to use the <code>SetupWizard.jar</code> included with Sagittarius. Simply follow the Setup Wizard's instructions; it's as easy as that!</p>
-					<p>Alternatively, you can manually deploy your app using the App Engine SDK.</p>
-
-					<h3><a name="next-steps" class="anchor" href="#next-steps"><span class="octicon octicon-link"></span></a>Next Steps</h3>
-					<p>Coming soon!!!</p>
-
-<!--<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>-->
-
+					<h2 id="downloading-sagittarius">Downloading Sagittarius</h2>
+					<p>Visit the <a href="downloads.html">downloads page</a> to get the recommended version of Sagittarius. Extract Sagittarius from its ZIP archive. You should see a directory structure much like the following:</p>
+<pre class="prettyprint">
+Sagittarius-Dist/
+├── sagittarius/
+│   ├── css/
+│   ├── img/
+│   ├── js/
+│   ├── app.yaml
+│   ├── index.html
+│   └── sagittarius.py
+└── README
+</pre>
 				</section>
-				<script>printFooter();</script>
+
+				<section id="deploying-your-application">
+					<div class="page-header">
+						<h1>Deploying Your Application</h1>
+					</div>
+					
+					<h2 id="modifying-appyaml">Modifying app.yaml</h2>
+					<p>Open up <code>sagittarius/app.yaml</code> in your favorite text editor. You should see the following:</p>
+<pre class="prettyprint linenums pre-scrollable lang-bsh">
+application: [APP ID HERE]
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /favicon.ico
+  static_files: img/favicon.ico
+  upload: img/favicon.ico
+
+- url: /css
+  static_dir: css
+
+- url: /js
+  static_dir: js
+
+- url: /img
+  static_dir: img
+
+- url: /admin/.*
+  script: google.appengine.ext.admin.application
+  login: admin
+
+- url: /.*
+  script: sagittarius.application
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+
+env_variables:
+  SAGITTARIUS_PASSWORD: [APP PASSWORD HERE]
+</pre>
+					<p>You will need to replace <code>[APP ID HERE]</code> on <strong>line 1</strong> with the previously-mentioned <code>Application Identifier</code> unique to your app.</p>
+					<p>You will also need to supply Sagittarius with a password by replacing <code>[APP PASSWORD HERE]</code> on <strong>line 35</strong>. Sagittarius uses this password to encrypt communication between clients and the server as well as secure uploaded files. The password can be any length (even an empty string) and any combination of characters. However, it is recommended that you choose an alphanumeric password between 10 and 30 characters long.</p>
+					<p>Once you are done making these changes, save and close <code>app.yaml</code>.</p>
+
+					<h2 id="using-google-launcher">Using Google Launcher</h2>
+					<p>Launch the Google App Engine Launcher, which should have come with your App Engine SDK. In the main window you will see a list of available applications. To add Sagittarius to this list, go to <strong>File &rarr; Add Existing Application...</strong> and browse to the <code>Sagittarius-Dist/sagittarius/</code> folder:</p>
+					<img src="img/getting-started-1.jpg" style="margin-bottom:10px;" />
+					<p>It is important that you select the <i>folder</i> itself, just as in the image above. You can choose whatever ports you would like for the <strong>Port</strong> and <strong>Admin Port</strong> fields; these are for localhost debug purposes and do not affect deployment.</p>
+					<p>Click <strong>Add</strong> and you should see your new application in the main list. Select it and click <strong>Deploy</strong>. The Launcher will open up a new window and prompt you for your Google account email and password. After supplying these, click <strong>OK</strong> and follow the rest of the deployment process. Congratulations, you have successfully deployed your app!</p>
+				</section>
+
+				<section id="project-integration">
+					<div class="page-header">
+						<h1>Project Integration</h1>
+					</div>
+					<p>First, <a href="starter-kits.html">download a starter kit</a> of your choice and integrate it into your project. How you do so will depend on the language you are using. The readme accompanying each starter kit has some basic steps to follow if you are lost.</p>
+					<p>Next, you can visit the tutorial hub for your particular starter kit:</p>
+					<div class="media">
+						<a class="pull-left" href="#">
+							<img class="media-object" src="img/sk-unrealscript.png" width="96">
+						</a>
+						<div class="media-body" style="margin-top:10px;"><h2 class="media-heading">UnrealScript - Coming soon!</h2></div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="#">
+							<img class="media-object" src="img/sk-java.png" width="96">
+						</a>
+						<div class="media-body" style="margin-top:10px;"><h2 class="media-heading">Java - Coming soon!</h2></div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="#">
+							<img class="media-object" src="img/sk-cplusplus.png" width="96">
+						</a>
+						<div class="media-body" style="margin-top:10px;"><h2 class="media-heading">C/C++ - Planned</h2></div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="#">
+							<img class="media-object" src="img/sk-actionscript.png" width="96">
+						</a>
+						<div class="media-body" style="margin-top:10px;"><h2 class="media-heading">ActionScript - Planned</h2></div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="#">
+							<img class="media-object" src="img/sk-javascript.png" width="96">
+						</a>
+						<div class="media-body" style="margin-top:10px;"><h2 class="media-heading">JavaScript - Planned</h2></div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="#">
+							<img class="media-object" src="img/sk-objectivec.png" width="96">
+						</a>
+						<div class="media-body" style="margin-top:10px;"><h2 class="media-heading">Objective-C - Planned</h2></div>
+					</div>
+				</section>
+
+				<section id="next-steps">
+					<div class="page-header">
+						<h1>Next Steps</h1>
+					</div>
+					<p class="lead">None yet.</p>
+				</section>
+
 			</div>
 		</div>
-	</body>
+	</div>
+
+	<script>printFooter();</script>
+
+	<script src="js/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/holder.js"></script>
+	<script src="js/prettify.js"></script>
+	<script src="js/application.js"></script>
+</body>
 </html>

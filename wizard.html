@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Wizard - Sagittarius Wiki</title>
+	<script src="js/main.js"></script>
+	<script>printFavicon();</script>
+
+	<link href="css/bootstrap.css" rel="stylesheet" />
+	<link href="css/bootstrap-responsive.css" rel="stylesheet" />
+	<link href="css/docs.css" rel="stylesheet" />
+	<link href="css/prettify.css" rel="stylesheet" />
+
+	<!--[if lt IE 9]>
+		<script src="js/html5shiv.js"></script>
+	<![endif]-->
+</head>
+<body data-spy="scroll" data-target=".bs-docs-sidebar">
+	<script>printNav("Wizard");</script>
+
+	<header class="jumbotron subhead" id="overview">
+		<div class="container">
+			<h1>Sagittarius Wizard</h1>
+			<p class="lead">Learn how to use the wizard to manage your application</p>
+		</div>
+	</header>
+
+	<div class="container">
+		<div class="row">
+			<div class="span3 bs-docs-sidebar">
+				<ul class="nav nav-list bs-docs-sidenav">
+					<li><a href="#running-the-wizard"><i class="icon-chevron-right"></i>Running the Wizard</a></li>
+					<li><a href="#recipes"><i class="icon-chevron-right"></i>Recipes</a></li>
+					<li><a href="#global-options"><i class="icon-chevron-right"></i>Global Options</a></li>
+					<li><a href="#understanding-the-output"><i class="icon-chevron-right"></i>Understanding the Output</a></li>
+				</ul>
+			</div>
+			<div class="span9">
+
+				<section id="running-the-wizard">
+					<div class="page-header">
+						<h1>Running the Wizard</h1>
+					</div>
+
+					<div class="alert alert-block">
+						<h4>Warning!</h4>
+						Currently the Sagittarius Wizard is available only in Python source form, not as an executable or application. To run it you will need either the <a href="http://www.pythonware.com/products/pil/">Python Imaging Library</a> (PIL) or its 64-bit alternative <a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/#pillow">Pillow</a>.
+					</div>
+
+					<p>Navigate to the <code>Sagittarius-Wizard/</code> directory of your Sagittarius distribution and run the command <code>python SagittariusWizard.py</code> in your favorite command line.</p>
+				</section>
+
+				<section id="recipes">
+					<div class="page-header">
+						<h1>Recipes</h1>
+					</div>
+
+					<h2 id="what-are-recipes">What Are Recipes?</h2>
+					<p>Using the wizard revolves around the idea of <span class="label label-important">RECIPES</span>. A recipe is a collection of buttons (you can think of them as &ldquo;ingredients&rdquo;), each with certain attributes, that does something when submitted to your application. The following buttons are available:</p>
+					
+					<h2 id="adding-and-deleting-buttons">Adding and Deleting Buttons</h2>
+					<p>Add a button to your recipe by clicking on it in the <strong>Available Buttons</strong> row. Not all buttons in the row will be clickable; for example, once you have selected an action you cannot add another one, so all the action buttons will be grayed-out. Once you have added a button, you can click on it in the <strong>Recipe</strong> row to modify its attributes. Doing so will bring up a dialogue of available options for that button type.</p>
+					<p>If you want to delete a button from your recipe, just right-click it. However, you cannot delete an action button if you have added other buttons to your recipe. For a quick way to clear an entire recipe, go to <strong>File &rarr; Clear Recipe</strong> or press <strong>Ctrl+N</strong>.</p>
+
+					<h2 id="managing-recipes">Managing Recipes</h2>
+					<p>The best part about recipes is that you can save and load them at any time. To save a new recipe, go to <strong>File &rarr; Save Recipe As...</strong> or press <strong>Alt+S</strong> and enter the name you would like to give the recipe. You can also use the quicker <strong>File &rarr; Save Recipe</strong> or <strong>Ctrl+S</strong> (if the recipe has not already been saved, you will be prompted to name it).</p>
+					<p>You can load a recipe by going to <strong>File &rarr; Load Recipe</strong> or pressing <strong>Ctrl+O</strong>. Choose the recipe you want to load from the dropdown list and press <strong>Load</strong> to load it.</p>
+					<p>A saved recipe can be deleted by going to <strong>File &rarr; Delete Recipe</strong> (for safety reasons there is no shortcut command). This will NOT clear the recipe from the <strong>Recipe</strong> row, but it <i>will</i> remove it from the save file. Similarly, if you clear a loaded recipe you can still save it to file; the saved recipe will be empty.</p>
+					<div class="alert alert-block alert-info">
+						<h4>A Note on Saving</h4>
+						The save file for the Sagittarius Wizard is a file called <code>recipes.dat</code> in the same directory as <code>SagittariusWizard.py</code>. Avoid modifying this file. Also, this file is not written to until the wizard is <i>closed</i>, meaning that if the wizard should crash or be process-interrupted, you will lose any changes you have made in the current session.
+					</div>
+				</section>
+
+				<section id="global-options">
+					<div class="page-header">
+						<h1>Global Options</h1>
+					</div>
+					<p>Before submitting a recipe, you must fill out the App ID and Password fields in the <strong>Global Options</strong> row. These values are the same as the values of <code>[APP ID HERE]</code> and <code>[APP PASSWORD HERE]</code> from your application's <code>app.yaml</code> file. For more information, see <a href="getting-started.html#modifying-appyaml">here</a>.</p>
+					<p>For convenience, these fields are saved every time you exit and will have their previous values the next time you run the wizard.</p>
+				</section>
+
+				<section id="understanding-the-output">
+					<div class="page-header">
+						<h1>Understanding the Output</h1>
+					</div>
+					<p class="lead">None yet.</p>
+				</section>
+
+			</div>
+		</div>
+	</div>
+
+	<script>printFooter();</script>
+
+	<script src="js/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/holder.js"></script>
+	<script src="js/prettify.js"></script>
+	<script src="js/application.js"></script>
+</body>
+</html>
