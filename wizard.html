@@ -57,6 +57,89 @@
 
 					<h2 id="what-are-recipes">What Are Recipes?</h2>
 					<p>Using the wizard revolves around the idea of <span class="label label-important">RECIPES</span>. A recipe is a collection of buttons (you can think of them as &ldquo;ingredients&rdquo;), each with certain attributes, that does something when submitted to your application. The following buttons are available:</p>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/get.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Get Action</h4>
+							Get objects or parts of objects from the database. Which objects are returned, and how many to return, are based on the filters and limits you apply to this action.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/add.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Add Action</h4>
+							Add an object with the specified attributes to the database.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/mod.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Modify Action</h4>
+							Modify certain attributes of objects from the database, optionally returning the modified objects. The objects to modify are determined by applied filters and limits.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/filter.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Add Filter</h4>
+							Filters restrict which objects to return based on equality. For example, an <code>object_type==motd</code> filter would only return objects whose type is &ldquo;motd&rdquo;. <strong>Available only for GET and MODIFY actions</strong>.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/project.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Add Projection</h4>
+							Projections tell the database to return only the attributes of the object that are specified. If no projections are specified, the entire object is returned (at higher cost). <strong>Available only for GET and MODIFY actions</strong>.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/attribute.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Add Attribute</h4>
+							Specifies the value of an attribute for the object to be added to the database. <strong>Available only for ADD action</strong>.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/modification.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Modify Attribute</h4>
+							Specifies the new value of an attribute to be modified. If more than one object is being modified, all objects will take on this new value. <strong>Available only for MODIFY action</strong>.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/limit.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Set Limit</h4>
+							Sets the maximum number of objects to operate on. If more objects exist that satisfy your query, they will be ignored. <strong>Available only for GET and MODIFY actions</strong>.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/offset.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Set Offset</h4>
+							Sets the offset in the database to return results. This allows for pagination across multiple queries: query 1 can get objects 0-19, query 2 can get objects 20-39, and so on. <strong>Available only for GET and MODIFY actions</strong>.
+						</div>
+					</div>
+					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/returns.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Returns Results</h4>
+							By default, the MODIFY action does not return objects it modifies. This button tells the action to return results after modification, optionally with projections and limits as in a GET action. <strong>Available only for MODIFY action</strong>.
+						</div>
+					</div>
+
+					<h2 id="an-example-recipe">An Example Recipe</h2>
+					<p>Consider the recipe below:</p>
+					<div>
+						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/get.png" width="70"></div>
+						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/filter.png" width="70"></div>
+						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/filter.png" width="70"></div>
+						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/project.png" width="70"></div>
+						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/limit.png" width="70"></div>
+						<div style="clear:both;"></div>
+					</div>
+					<p>This is a simple recipe that queries for the current Message of the Day. The first button tells Sagittarius that it wants to GET data. The two filters make sure that all returned objects have <code>object_type==motd</code> and <code>object_name==motd</code>. Since we only want the actual message, we add a projection on the <code>message</code> attribute of our MOTD object. Finally, we only want one MOTD returned, so we set a limit of 1.</p>
+					
 					
 					<h2 id="adding-and-deleting-buttons">Adding and Deleting Buttons</h2>
 					<p>Add a button to your recipe by clicking on it in the <strong>Available Buttons</strong> row. Not all buttons in the row will be clickable; for example, once you have selected an action you cannot add another one, so all the action buttons will be grayed-out. Once you have added a button, you can click on it in the <strong>Recipe</strong> row to modify its attributes. Doing so will bring up a dialogue of available options for that button type.</p>
@@ -84,7 +167,7 @@
 					<div class="page-header">
 						<h1>Understanding the Output</h1>
 					</div>
-					<p class="lead">None yet.</p>
+					<p class="lead">Coming soon!</p>
 				</section>
 
 			</div>
