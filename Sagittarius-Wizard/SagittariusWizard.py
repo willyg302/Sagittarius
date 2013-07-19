@@ -264,8 +264,11 @@ class SagittariusWizard(ttk.Frame):
         self._available_button(lf, 'mod', 'Modify')
         self._available_button(lf, 'filter', 'Add Filter')
         self._available_button(lf, 'project', 'Add Projection')
+        self._available_button(lf, 'attribute', 'Add Attribute')
+        self._available_button(lf, 'modification', 'Modify Attribute')
         self._available_button(lf, 'limit', 'Set Limit')
         self._available_button(lf, 'offset', 'Set Offset')
+        self._available_button(lf, 'returns', 'Returns Results')
         return lf
 
     def _recipe_pane(self, parent):
@@ -305,7 +308,7 @@ class SagittariusWizard(ttk.Frame):
         self.validateAvailableButtons()
 
     def getButton(self, parent, butID, side, command):
-        colorDict = {'submit': '#90A959', 'get': '#6A9FB5', 'add': '#6A9FB5', 'mod': '#6A9FB5', 'filter': '#AA759F', 'project': '#AA759F', 'limit': '#D28445', 'offset': '#F4BF75'}
+        colorDict = {'submit': '#90A959', 'get': '#6A9FB5', 'add': '#6A9FB5', 'mod': '#6A9FB5', 'filter': '#AA759F', 'project': '#AA759F', 'attribute': '#75B5AA', 'modification': '#75B5AA', 'limit': '#D28445', 'offset': '#F4BF75', 'returns': '#8F5536'}
         img = ImageTk.PhotoImage(file=butID + ".png")
         self.img_cache.append(img)
         color = colorDict[butID]
@@ -317,6 +320,7 @@ class SagittariusWizard(ttk.Frame):
         actionIndex = -1
         bHasLimit = False
         bHasOffset = False
+        bHasReturnsResults = False
 
         # Determine allowable buttons using current recipe
         for button in self.recipeButtons:
@@ -329,15 +333,20 @@ class SagittariusWizard(ttk.Frame):
                 bHasLimit = True
             if button.getID() == 'offset' and not bHasOffset:
                 bHasOffset = True
+            if button.getID() == 'returns' and not bHasReturnsResults:
+                bHasReturnsResults = True
 
         # Set available buttons now!
         self.availableButtons[0]['state'] = 'disabled' if actionIndex != -1 else 'active'
         self.availableButtons[1]['state'] = 'disabled' if actionIndex != -1 else 'active'
         self.availableButtons[2]['state'] = 'disabled' if actionIndex != -1 else 'active'
-        self.availableButtons[3]['state'] = 'active' if actionIndex == 0 else 'disabled'
-        self.availableButtons[4]['state'] = 'active' if actionIndex == 0 else 'disabled'
-        self.availableButtons[5]['state'] = 'disabled' if (bHasLimit or actionIndex == -1) else 'active'
-        self.availableButtons[6]['state'] = 'disabled' if (bHasOffset or actionIndex == -1) else 'active'
+        self.availableButtons[3]['state'] = 'active' if (actionIndex == 0 or actionIndex == 2) else 'disabled'
+        self.availableButtons[4]['state'] = 'active' if (actionIndex == 0 or actionIndex == 2) else 'disabled'
+        self.availableButtons[5]['state'] = 'active' if actionIndex == 1 else 'disabled'
+        self.availableButtons[6]['state'] = 'active' if actionIndex == 2 else 'disabled'
+        self.availableButtons[7]['state'] = 'disabled' if (bHasLimit or actionIndex == -1 or actionIndex == 1) else 'active'
+        self.availableButtons[8]['state'] = 'disabled' if (bHasOffset or actionIndex == -1 or actionIndex == 1) else 'active'
+        self.availableButtons[9]['state'] = 'disabled' if (bHasReturnsResults or actionIndex != 2) else 'active'
 
     def submitRecipe(self):
         # Determine action (and return if one is not added!)
@@ -355,7 +364,7 @@ class SagittariusWizard(ttk.Frame):
                 bIsAction = False
             if bIsAction:
                 continue
-            URLString += (delim + but.getData())
+            URLString += (delim + (but.getData() if (but.getID() != 'returns') else 'rres=true'))
             delim = '&'
         self.text.insert(END, "URL String: " + URLString + "\n")
 
@@ -374,6 +383,10 @@ class SagittariusWizard(ttk.Frame):
             self.filterBox(button)
         elif button.getID() == 'project':
             self.projectBox(button)
+        elif button.getID() == 'attribute':
+            self.attributeBox(button)
+        elif button.getID() == 'modification':
+            self.modifyBox(button)
         elif button.getID() == 'limit':
             self.limitBox(button)
         elif button.getID() == 'offset':
@@ -402,7 +415,7 @@ class SagittariusWizard(ttk.Frame):
         cancel.grid(row=row, column=2, padx=5, pady=5, sticky=W+E)
 
     def filterBox(self, button):
-        top = self.getBoxTop('Filter')
+        top = self.getBoxTop('Add Filter')
         field = ''
         value = ''
         if '::' in button.getData():
@@ -413,15 +426,37 @@ class SagittariusWizard(ttk.Frame):
         self.getBoxButtons(top, 2, lambda: self.submitBox(button, "f=" + fieldEntry.get() + "::" + valueEntry.get(), top))
 
     def projectBox(self, button):
-        top = self.getBoxTop('Project')
+        top = self.getBoxTop('Add Projection')
         project = ''
         if button.getData() != '':
             project = button.getData()[2:]
         projectEntry = self.getBoxEntry(top, 'Project:', 0, project)
         self.getBoxButtons(top, 1, lambda: self.submitBox(button, "p=" + projectEntry.get(), top))
 
+    def attributeBox(self, button):
+        top = self.getBoxTop('Add Attribute')
+        field = ''
+        value = ''
+        if '::' in button.getData():
+            field = button.getData().split('::')[0][2:]
+            value = button.getData().split('::')[1]
+        fieldEntry = self.getBoxEntry(top, 'Field:', 0, field)
+        valueEntry = self.getBoxEntry(top, 'Value:', 1, value)
+        self.getBoxButtons(top, 2, lambda: self.submitBox(button, "a=" + fieldEntry.get() + "::" + valueEntry.get(), top))
+
+    def modifyBox(self, button):
+        top = self.getBoxTop('Modify Attribute')
+        field = ''
+        value = ''
+        if '::' in button.getData():
+            field = button.getData().split('::')[0][2:]
+            value = button.getData().split('::')[1]
+        fieldEntry = self.getBoxEntry(top, 'Field:', 0, field)
+        valueEntry = self.getBoxEntry(top, 'Value:', 1, value)
+        self.getBoxButtons(top, 2, lambda: self.submitBox(button, "m=" + fieldEntry.get() + "::" + valueEntry.get(), top))
+
     def limitBox(self, button):
-        top = self.getBoxTop('Limit')
+        top = self.getBoxTop('Set Limit')
         limit = ''
         if button.getData() != '':
             limit = button.getData()[5:]
@@ -429,7 +464,7 @@ class SagittariusWizard(ttk.Frame):
         self.getBoxButtons(top, 1, lambda: self.submitBox(button, "rlim=" + limitEntry.get(), top))
 
     def offsetBox(self, button):
-        top = self.getBoxTop('Offset')
+        top = self.getBoxTop('Set Offset')
         offset = ''
         if button.getData() != '':
             offset = button.getData()[5:]

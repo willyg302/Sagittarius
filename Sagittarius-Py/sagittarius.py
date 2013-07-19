@@ -1,15 +1,9 @@
 #!/usr/local/bin/python
 # coding: utf-8
-import os
-import urllib
 
-from google.appengine.api import users
+import os, urllib, jinja2, webapp2
+from google.appengine.api import users, mail, app_identity
 from google.appengine.ext import ndb
-from google.appengine.api import mail
-from google.appengine.api import app_identity
-
-import jinja2
-import webapp2
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -42,7 +36,6 @@ class GetAction(webapp2.RequestHandler):
 
     def post(self):
         ret = ''
-
         limit = int(self.request.get('rlim', '20'))
         offset = int(self.request.get('roff', '0'))
 
@@ -57,7 +50,7 @@ class GetAction(webapp2.RequestHandler):
         for f in filters:
             parts = f.split('::')
             q = q.filter(ndb.GenericProperty(parts[0]) == parts[1])
-        #q = q.order(-DBObject.date)
+        #q = q.order(-DBObject.date) # We can't do this because only simple queries are allowed on Expandos
 
         # Iterate over results
         for obj in q.iter(limit=limit, offset=offset):
@@ -74,25 +67,70 @@ class GetAction(webapp2.RequestHandler):
 class AddAction(webapp2.RequestHandler):
 
     def post(self):
-        # Object properties specified
-        properties = self.request.get_all('p')
-        if not properties:
-            properties.append('object_type::' + DEFAULT_DBOBJECT_TYPE)
-            properties.append('object_name::' + DEFAULT_DBOBJECT_NAME)
+        ret = ''
 
+        # Object attributes specified (if none, we add a "default object")
+        attributes = self.request.get_all('a')
+        if not attributes:
+            attributes.append('object_type::' + DEFAULT_DBOBJECT_TYPE)
+            attributes.append('object_name::' + DEFAULT_DBOBJECT_NAME)
+
+        # Create our object
         obj = DBObject()
-        for p in properties:
-            parts = p.split('::')
-            if (parts[0] == 'object_type'):
-                obj.object_type = parts[1]
-            elif (parts[0] == 'object_name'):
-                obj.object_name = parts[1]
-            else:
-                setattr(obj, parts[0], parts[1])
-
+        for a in attributes:
+            parts = a.split('::')
+            setattr(obj, parts[0], parts[1])
         obj.put()
-        # @TODO: Response?
-        #self.response.write("<resp>Added: " + obj.to_dict() + "</resp>")
+
+        # Generate a quick response
+        for k in obj._properties.keys():
+            ret += ("<" + k + ">" + str(getattr(obj, k, 'null')) + "</" + k + ">")
+        self.response.write("<resp>Added object: " + ret + "</resp>")
+
+
+class ModAction(webapp2.RequestHandler):
+
+    def post(self):
+        ret = ''
+        limit = int(self.request.get('rlim', '20'))
+        offset = int(self.request.get('roff', '0'))
+
+        # Our optional filters (possibly none at all)
+        filters = self.request.get_all('f')
+
+        # Projections (possibly none), and whether to return results at all
+        projections = self.request.get_all('p')
+        bReturn = self.request.get('rres', 'false')
+
+        # Modifications to make (possibly none)
+        modifications = self.request.get_all('m')
+
+        # Generate and run query
+        q = DBObject.query()
+        for f in filters:
+            parts = f.split('::')
+            q = q.filter(ndb.GenericProperty(parts[0]) == parts[1])
+        #q = q.order(-DBObject.date) # We can't do this because only simple queries are allowed on Expandos
+
+        # Iterate over results and make modifications (We use fetch here because we're modifying in-loop)
+        results = q.fetch(limit, offset=offset)
+        for obj in results:
+            for m in modifications:
+                parts = m.split('::')
+                setattr(obj, parts[0], parts[1])
+            obj.put()
+            if bReturn == 'false':
+                continue
+            if not projections:
+                projections = obj._properties.keys()
+            for p in projections:
+                ret += ("<" + p + ">" + str(getattr(obj, p, 'null')) + "</" + p + ">")
+            ret += '\n'
+
+        # Send response to user!
+        if ret == '':
+            ret = 'Success!'
+        self.response.write("<resp>" + ret + "</resp>")
 
 
 class SendMail(webapp2.RequestHandler):
@@ -110,5 +148,6 @@ application = webapp2.WSGIApplication([
     ('/index.html', MainPage),
     ('/dbget', GetAction),
     ('/dbadd', AddAction),
+    ('/dbmod', ModAction),
     ('/mail', SendMail),
 ], debug=True)
