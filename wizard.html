@@ -79,52 +79,59 @@
 						</div>
 					</div>
 					<div class="media">
+						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/del.png" width="70"></a>
+						<div class="media-body">
+							<h4 class="media-heading">Delete Action</h4>
+							Delete all objects that satisfy the applied filters and limits from the database, optionally returning them.
+						</div>
+					</div>
+					<div class="media">
 						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/filter.png" width="70"></a>
 						<div class="media-body">
 							<h4 class="media-heading">Add Filter</h4>
-							Filters restrict which objects to return based on equality. For example, an <code>object_type==motd</code> filter would only return objects whose type is &ldquo;motd&rdquo;. <strong>Available only for GET and MODIFY actions</strong>.
+							Filters restrict which objects to return based on equality. For example, an <code>object_type==motd</code> filter would only return objects whose type is &ldquo;motd&rdquo;. <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
 						</div>
 					</div>
 					<div class="media">
 						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/project.png" width="70"></a>
 						<div class="media-body">
 							<h4 class="media-heading">Add Projection</h4>
-							Projections tell the database to return only the attributes of the object that are specified. If no projections are specified, the entire object is returned (at higher cost). <strong>Available only for GET and MODIFY actions</strong>.
+							Projections tell the database to return only the attributes of the object that are specified. If no projections are specified, the entire object is returned (at higher cost). <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
 						</div>
 					</div>
 					<div class="media">
 						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/attribute.png" width="70"></a>
 						<div class="media-body">
 							<h4 class="media-heading">Add Attribute</h4>
-							Specifies the value of an attribute for the object to be added to the database. <strong>Available only for ADD action</strong>.
+							Specifies the value of an attribute for the object to be added to the database. <strong>[ADD]</strong>
 						</div>
 					</div>
 					<div class="media">
 						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/modification.png" width="70"></a>
 						<div class="media-body">
 							<h4 class="media-heading">Modify Attribute</h4>
-							Specifies the new value of an attribute to be modified. If more than one object is being modified, all objects will take on this new value. <strong>Available only for MODIFY action</strong>.
+							Specifies the new value of an attribute to be modified. If more than one object is being modified, all objects will take on this new value. <strong>[MODIFY]</strong>
 						</div>
 					</div>
 					<div class="media">
 						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/limit.png" width="70"></a>
 						<div class="media-body">
 							<h4 class="media-heading">Set Limit</h4>
-							Sets the maximum number of objects to operate on. If more objects exist that satisfy your query, they will be ignored. <strong>Available only for GET and MODIFY actions</strong>.
+							Sets the maximum number of objects to operate on. If more objects exist that satisfy your query, they will be ignored. <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
 						</div>
 					</div>
 					<div class="media">
 						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/offset.png" width="70"></a>
 						<div class="media-body">
 							<h4 class="media-heading">Set Offset</h4>
-							Sets the offset in the database to return results. This allows for pagination across multiple queries: query 1 can get objects 0-19, query 2 can get objects 20-39, and so on. <strong>Available only for GET and MODIFY actions</strong>.
+							Sets the offset in the database to return results. This allows for pagination across multiple queries: query 1 can get objects 0-19, query 2 can get objects 20-39, and so on. <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
 						</div>
 					</div>
 					<div class="media">
 						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/returns.png" width="70"></a>
 						<div class="media-body">
 							<h4 class="media-heading">Returns Results</h4>
-							By default, the MODIFY action does not return objects it modifies. This button tells the action to return results after modification, optionally with projections and limits as in a GET action. <strong>Available only for MODIFY action</strong>.
+							By default, the MODIFY and DELETE actions do not return objects. This button tells the actions to return results, optionally with projections and limits as in a GET action. <strong>[MODIFY &middot; DELETE]</strong>
 						</div>
 					</div>
 
