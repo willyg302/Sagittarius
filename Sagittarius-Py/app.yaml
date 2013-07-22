@@ -1,4 +1,4 @@
-application: sagittarius-test
+application: [APP ID HERE]
 version: 1
 runtime: python27
 api_version: 1
@@ -32,4 +32,4 @@ libraries:
   version: latest
 
 env_variables:
-  SAGITTARIUS_PASSWORD: password
+  SAGITTARIUS_PASSWORD: [APP PASSWORD HERE]
