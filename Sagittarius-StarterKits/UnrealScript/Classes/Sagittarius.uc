@@ -1,3 +1,8 @@
+/**
+ * Sagittarius - UnrealScript Starter Kit
+ * Copyright 2013 WillyG Productions
+ * @Authors: William Gaul
+ */
 class Sagittarius extends Actor;
 
 var SagittariusLinkClient Link;

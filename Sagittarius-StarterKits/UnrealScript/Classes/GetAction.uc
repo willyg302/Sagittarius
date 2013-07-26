@@ -1,3 +1,8 @@
+/**
+ * Sagittarius - UnrealScript Starter Kit
+ * Copyright 2013 WillyG Productions
+ * @Authors: William Gaul
+ */
 class GetAction extends Action;
 
 var protected int ResultLimit, ResultOffset;
