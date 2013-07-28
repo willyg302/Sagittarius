@@ -32,6 +32,7 @@
 					<li><a href="#basic-integration"><i class="icon-chevron-right"></i>Basic Integration</a></li>
 					<li><a href="#easy-motd-module"><i class="icon-chevron-right"></i>Easy: MOTD Module</a></li>
 					<li><a href="#medium-server-browser"><i class="icon-chevron-right"></i>Medium: Server Browser</a></li>
+					<li><a href="#special-functions"><i class="icon-chevron-right"></i>Special Functions</a></li>
 					<li><a href="#logging"><i class="icon-chevron-right"></i>Logging</a></li>
 				</ul>
 			</div>
@@ -290,6 +291,19 @@ function PrintMOTD()
 						<h1>Medium: Server Browser</h1>
 					</div>
 					<p class="lead">Coming soon!</p>
+				</section>
+
+				<section id="special-functions">
+					<div class="page-header">
+						<h1>Special Functions</h1>
+					</div>
+
+					<h2 id="sending-mail">Sending Mail</h2>
+					<p>You can send an email any time from within UDK using the <code>SendMail()</code> function in <code>Sagittarius.uc</code>:</p>
+<pre class="prettyprint">
+function SendMail(string Receiver, string Subject, string Message, optional string Sender = "")
+</pre>
+					<p>The Sender parameter is a string referencing the subdomain of your application that you want the email to be sent from. For example, if your <code>Application Identifier</code> is &ldquo;myapplication&rdquo; and your Sender parameter is set to &ldquo;donuts&rdquo;, then the recipient will receive an email from <strong>donuts@myapplication.appspotmail.com</strong>. Note that you do not have to specify a Sender; if you don't, it will default to &ldquo;admin&rdquo;.</p>
 				</section>
 
 				<section id="logging">
