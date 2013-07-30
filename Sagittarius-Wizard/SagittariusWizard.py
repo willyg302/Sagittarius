@@ -8,6 +8,8 @@ import ttk
 from PIL import ImageTk
 import webbrowser, httplib, urllib
 
+import encrypt
+
 WIZARD_HELP_URL = 'http://willyg302.github.io/Sagittarius/wizard.html'
 headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
 
@@ -350,6 +352,16 @@ class SagittariusWizard(ttk.Frame):
         self.availableButtons[9]['state'] = 'disabled' if (bHasOffset or actionIndex == -1 or actionIndex == 1) else 'active'
         self.availableButtons[10]['state'] = 'disabled' if (bHasReturnsResults or actionIndex < 2) else 'active'
 
+    def getButtonData(self, button):
+        data = button.getData()
+        if data.startswith('~'):
+            if button.getID() == 'project':
+                return data[1:3] + "~" + data[3:]
+            else:
+                return data[1:3] + encrypt.encrypt(data[3:], self.password.get())
+        else:
+            return data
+
     def submitRecipe(self):
         # Determine action (and return if one is not added!)
         if not self.recipeButtons or self.appID.get() == '':
@@ -366,7 +378,7 @@ class SagittariusWizard(ttk.Frame):
                 bIsAction = False
             if bIsAction:
                 continue
-            URLString += (delim + (but.getData() if (but.getID() != 'returns') else 'rres=true'))
+            URLString += (delim + (self.getButtonData(but) if (but.getID() != 'returns') else 'rres=true'))
             delim = '&'
         self.text.insert(END, "URL String: " + URLString + "\n")
 
@@ -409,53 +421,59 @@ class SagittariusWizard(ttk.Frame):
         entry.grid(row=row, column=1, padx=5, pady=5, columnspan=2)
         return entry
 
+    def getEncryptButton(self, owner, row, initial):
+        var = IntVar()
+        var.set(initial)
+        check = Checkbutton(owner, text="Encrypt", variable=var, font=('TkDefaultFont', 14))
+        check.grid(row=row, column=1, padx=5, columnspan=2)
+        check.var = var
+        return check
+
     def getBoxButtons(self, owner, row, submitter):
-        ##print(submitText)
         submit = Button(owner, text='Submit', command=submitter)
         submit.grid(row=row, column=1, padx=5, pady=5, sticky=W+E)
         cancel = Button(owner, text='Cancel', command=lambda: owner.destroy())
         cancel.grid(row=row, column=2, padx=5, pady=5, sticky=W+E)
 
-    def filterBox(self, button):
-        top = self.getBoxTop('Add Filter')
+    def getFieldValueBox(self, button, title, urlLetter):
+        top = self.getBoxTop(title)
         field = ''
         value = ''
-        if '::' in button.getData():
-            field = button.getData().split('::')[0][2:]
-            value = button.getData().split('::')[1]
+        check = 0
+        data = button.getData()
+        if data.startswith('~'):
+            check = 1
+            data = data[1:]
+        if '::' in data:
+            field = data.split('::')[0][2:]
+            value = data.split('::')[1]
         fieldEntry = self.getBoxEntry(top, 'Field:', 0, field)
         valueEntry = self.getBoxEntry(top, 'Value:', 1, value)
-        self.getBoxButtons(top, 2, lambda: self.submitBox(button, "f=" + fieldEntry.get() + "::" + valueEntry.get(), top))
+        checkEntry = self.getEncryptButton(top, 2, check)
+        self.getBoxButtons(top, 3, lambda: self.submitBox(button, ("~" if checkEntry.var.get() == 1 else "") + urlLetter + "=" + fieldEntry.get() + "::" + valueEntry.get(), top))
+
+    def filterBox(self, button):
+        self.getFieldValueBox(button, 'Add Filter', 'f')
 
     def projectBox(self, button):
         top = self.getBoxTop('Add Projection')
         project = ''
-        if button.getData() != '':
-            project = button.getData()[2:]
+        check = 0
+        data = button.getData()
+        if data.startswith('~'):
+            check = 1
+            data = data[1:]
+        if data != '':
+            project = data[2:]
         projectEntry = self.getBoxEntry(top, 'Project:', 0, project)
-        self.getBoxButtons(top, 1, lambda: self.submitBox(button, "p=" + projectEntry.get(), top))
+        checkEntry = self.getEncryptButton(top, 1, check)
+        self.getBoxButtons(top, 2, lambda: self.submitBox(button, ("~" if checkEntry.var.get() == 1 else "") + "p=" + projectEntry.get(), top))
 
     def attributeBox(self, button):
-        top = self.getBoxTop('Add Attribute')
-        field = ''
-        value = ''
-        if '::' in button.getData():
-            field = button.getData().split('::')[0][2:]
-            value = button.getData().split('::')[1]
-        fieldEntry = self.getBoxEntry(top, 'Field:', 0, field)
-        valueEntry = self.getBoxEntry(top, 'Value:', 1, value)
-        self.getBoxButtons(top, 2, lambda: self.submitBox(button, "a=" + fieldEntry.get() + "::" + valueEntry.get(), top))
+        self.getFieldValueBox(button, 'Add Attribute', 'a')
 
     def modifyBox(self, button):
-        top = self.getBoxTop('Modify Attribute')
-        field = ''
-        value = ''
-        if '::' in button.getData():
-            field = button.getData().split('::')[0][2:]
-            value = button.getData().split('::')[1]
-        fieldEntry = self.getBoxEntry(top, 'Field:', 0, field)
-        valueEntry = self.getBoxEntry(top, 'Value:', 1, value)
-        self.getBoxButtons(top, 2, lambda: self.submitBox(button, "m=" + fieldEntry.get() + "::" + valueEntry.get(), top))
+        self.getFieldValueBox(button, 'Modify Attribute', 'm')
 
     def limitBox(self, button):
         top = self.getBoxTop('Set Limit')
@@ -470,7 +488,7 @@ class SagittariusWizard(ttk.Frame):
         offset = ''
         if button.getData() != '':
             offset = button.getData()[5:]
-        offsetEntry = self.getBoxEntry(top, 'Offset:', 0, button.getData())
+        offsetEntry = self.getBoxEntry(top, 'Offset:', 0, offset)
         self.getBoxButtons(top, 1, lambda: self.submitBox(button, "roff=" + offsetEntry.get(), top))
 
     def submitBox(self, button, data, box):
