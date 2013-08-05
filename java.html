@@ -46,12 +46,13 @@
 					<p>Once you have added all files without errors, creating an instance of Sagittarius is very simple:</p>
 <pre class="prettyprint">
 public static final String APP_ID = [APP ID HERE];
+public static final String APP_PASS = [APP PASSWORD HERE];
 
 public static void main(String[] args) {
-	Sagittarius sag = new Sagittarius("http://" + APP_ID + ".appspot.com", "80");
+	Sagittarius sag = new Sagittarius(APP_ID, APP_PASS);
 }
 </pre>
-					<p>Make sure to replace <code>[APP ID HERE]</code> with your own application ID. At this point Sagittarius will be fully integrated and ready to use, but it can't really do anything just yet. To start leveraging its power you will need to write some <i>modules</i>.</p>
+					<p>Make sure to replace <code>[APP ID HERE]</code> and <code>[APP PASSWORD HERE]</code>with your own application ID and password. At this point Sagittarius will be fully integrated and ready to use, but it can't really do anything just yet. To start leveraging its power you will need to write some <i>modules</i>.</p>
 				</section>
 
 				<section id="easy-motd-module">
@@ -213,7 +214,7 @@ public class MOTDModule extends Module {
 	}
 
 	public void QueryMOTD() {
-		GetAction ga = new GetAction();
+		GetAction ga = (GetAction)parent.CreateAction("get");
 		ga.AddFilter(GetAction.DBTYPE, "motd");
 		ga.AddFilter(GetAction.DBNAME, "motd");
 		ga.AddProjection("message");
@@ -223,7 +224,7 @@ public class MOTDModule extends Module {
 
 	@Override
 	public void OnTextReceived(String ActionID, String text) {
-		motd = Sagittarius.GetXMLValue("message", text);
+		motd = parent.GetXMLValue("message", text);
 	}
 
 	@Override
@@ -241,16 +242,17 @@ public class MOTDModule extends Module {
 import sagittarius.Handler;
 import sagittarius.Sagittarius;
 
-public static final String APP_ID = [APP ID HERE];
-
 public class SagittariusTest {
+
+	public static final String APP_ID = [APP ID HERE];
+	public static final String APP_PASS = [APP PASSWORD HERE];
 
 	public static void GrabMOTD(Sagittarius sag) {
 		System.out.println("OUR MOTD IS: " + ((MOTDModule) sag.GetModule("motd")).GetMOTD());
 	}
 
 	public static void main(String[] args) throws InterruptedException {
-		final Sagittarius sag = new Sagittarius("http://" + APP_ID + ".appspot.com", "80");
+		final Sagittarius sag = new Sagittarius(APP_ID, APP_PASS);
 		sag.RegisterModule(new MOTDModule(sag));
 
 		MOTDModule m = (MOTDModule) sag.GetModule("motd");

@@ -56,7 +56,7 @@
 					<p>Make sure to place Sagittarius before your game's directory, as the Sagittarius sources must be compiled first. This method is recommended to keep Sagittarius code separate from your projects. You should never have to touch any of the starter kit classes, and updating to a newer starter kit version will simply mean overwriting the contents of the <code>\Sagittarius\Classes\</code> folder.</p>
 
 					<h2 id="the-gameinfo-class">The GameInfo Class</h2>
-					<p>A class called <code>SagittariusGame.uc</code> is included with the starter kit to show the minimum amount of code needed to get Sagittarius up and running. You should copy this code into your own GameInfo class. Make sure to replace <code>[APP ID HERE]</code> in the DefaultProperties block with your own application ID.</p>
+					<p>A class called <code>SagittariusGame.uc</code> is included with the starter kit to show the minimum amount of code needed to get Sagittarius up and running. You should copy this code into your own GameInfo class. Make sure to replace <code>[APP ID HERE]</code> and <code>[APP PASSWORD HERE]</code> in the DefaultProperties block with your own application ID and password.</p>
 					<p>At this point Sagittarius will be fully integrated and ready to use, but it can't really do anything just yet. To start leveraging its power you will need to write some <i>modules</i>.</p>
 				</section>
 
@@ -221,7 +221,7 @@ function string GetMOTD()
 function QueryMOTD()
 {
 	local GetAction ga;
-	ga = new class'GetAction';
+	ga = GetAction(Parent.CreateAction("get"));
 	ga.AddFilter(ga.DBTYPE, "motd");
 	ga.AddFilter(ga.DBNAME, "motd");
 	ga.AddProjection("message");
@@ -256,7 +256,7 @@ event PreBeginPlay()
 {
 	super.PreBeginPlay();
 	Sag = Spawn(class'Sagittarius');
-	Sag.Initialize(SagittariusHost, SagittariusPort);
+	Sag.Initialize(SagittariusAppID, SagittariusPass);
 	Sag.RegisterModule(new class'MOTDModule');
 }
 
