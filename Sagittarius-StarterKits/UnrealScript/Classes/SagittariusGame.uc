@@ -6,20 +6,19 @@
 class SagittariusGame extends UTGame;
 
 var Sagittarius Sag;
-var string SagittariusHost;
-var int SagittariusPort;
+var string SagittariusAppID, SagittariusPass;
 
 event PreBeginPlay()
 {
 	super.PreBeginPlay();
 	Sag = Spawn(class'Sagittarius');
-	Sag.Initialize(SagittariusHost, SagittariusPort);
+	Sag.Initialize(SagittariusAppID, SagittariusPass);
 	// Here you would register any startup modules you might have
 }
 
 DefaultProperties
 {
 	bDelayedStart=false
-	SagittariusHost="[APP ID HERE].appspot.com"
-	SagittariusPort=80
+	SagittariusAppID="[APP ID HERE].appspot.com"
+	SagittariusPass="[APP PASSWORD HERE]"
 }

@@ -18,8 +18,12 @@ public class ModAction extends GetAction {
         this.returnsResults = false;
     }
 
+    public void AddModification(String field, String value, boolean encrypt) {
+        modifications.add(Encrypt(field + "::" + value, encrypt));
+    }
+    
     public void AddModification(String field, String value) {
-        modifications.add(field + "::" + value);
+        AddModification(field, value, false);
     }
 
     public void SetReturnsResults() {

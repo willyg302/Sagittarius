@@ -11,6 +11,7 @@ import java.io.PrintStream;
 public class Sagittarius {
 
     private SagittariusLinkClient link;
+    private String SagPass;
     private HashMap<String, Module> modules;
     private static PrintStream logStream = System.out;
     private static final String LOG_TAG = "Sagittarius";
@@ -21,9 +22,27 @@ public class Sagittarius {
     }
     private static ELogLevel logLevel = ELogLevel.LOG_Debug;
 
-    public Sagittarius(String THost, String TPort) {
-        this.link = new SagittariusLinkClient(this, THost, TPort);
+    public Sagittarius(String AppID, String Pass) {
+        this.link = new SagittariusLinkClient(this, AppID);
+        this.SagPass = Pass;
         this.modules = new HashMap<String, Module>();
+    }
+    
+    public Action CreateAction(String type) {
+        Action a = null;
+        if (type.equals("get")) {
+            a = new GetAction();
+        } else if (type.equals("add")) {
+            a = new AddAction();
+        } else if (type.equals("mod")) {
+            a = new ModAction();
+        } else if (type.equals("del")) {
+            a = new DelAction();
+        } else {
+            return a;
+        }
+        a.SetPassword(SagPass);
+        return a;
     }
 
     public void RegisterModule(Module m) {
@@ -138,7 +157,7 @@ public class Sagittarius {
         }
     }
 
-    public static String GetXMLValue(String XMLTag, String text) {
+    public String GetXMLValue(String XMLTag, String text) {
         int XMLTagStart = text.indexOf("<" + XMLTag + ">");
         if (XMLTagStart < 0) {
             return "";
@@ -148,6 +167,10 @@ public class Sagittarius {
         if (XMLTagEnd < XMLTagStart) {
             return "";
         }
-        return text.substring(XMLTagStart, XMLTagEnd);
+        String ret = text.substring(XMLTagStart, XMLTagEnd);
+        if (ret.startsWith("~")) {
+            ret = Encryption.Decrypt(ret, SagPass);
+        }
+        return ret;
     }
 }

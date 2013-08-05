@@ -8,14 +8,14 @@ class GetAction extends Action;
 var protected int ResultLimit, ResultOffset;
 var protected array<string> Filters, Projections;
 
-function AddFilter(string field, string value)
+function AddFilter(string field, string value, optional bool bEncrypt = false)
 {
-	Filters.AddItem(field $ "::" $ value);
+	Filters.AddItem(Encrypt(field $ "::" $ value, bEncrypt));
 }
 
-function AddProjection(string field)
+function AddProjection(string field, optional bool bEncrypt = false)
 {
-	Projections.AddItem(field);
+	Projections.AddItem((bEncrypt ? "~" : "") $ field);
 }
 
 function SetLimit(int rl)

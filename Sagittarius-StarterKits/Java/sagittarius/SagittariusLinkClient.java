@@ -21,10 +21,10 @@ public class SagittariusLinkClient {
     private Connection currentConnection;
     private AsyncHttpClient c = new AsyncHttpClient();
 
-    public SagittariusLinkClient(Sagittarius s, String THost, String TPort) {
+    public SagittariusLinkClient(Sagittarius s, String THost) {
         this.parent = s;
-        this.TargetHost = THost;
-        this.TargetPort = TPort;
+        this.TargetHost = "http://" + THost + ".appspot.com";
+        this.TargetPort = "80";
         this.connectionQueue = new ArrayList<Connection>();
         this.isBusy = false;
     }
@@ -108,9 +108,10 @@ public class SagittariusLinkClient {
             @Override
             public String onCompleted() throws Exception {
                 String ret = bytes.toString();
+                Sagittarius.LogDebug("Sent text: " + currentConnection.getData() + " to destination " + currentConnection.getDestination());
                 Sagittarius.LogDebug("End TCP connection");
                 if (ret != null) {
-                    String text = Sagittarius.GetXMLValue("resp", ret);
+                    String text = parent.GetXMLValue("resp", ret);
                     Sagittarius.LogDebug("Received Text: " + text);
                     parent.OnTextReceived(currentConnection.getModuleID(), currentConnection.getQueryID(), text);
                 }

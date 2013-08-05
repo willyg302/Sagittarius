@@ -7,9 +7,9 @@ class AddAction extends Action;
 
 var private array<string> Attributes;
 
-function AddAttribute(string field, string value)
+function AddAttribute(string field, string value, optional bool bEncrypt = false)
 {
-	Attributes.AddItem(field $ "::" $ value);
+	Attributes.AddItem(Encrypt(field $ "::" $ value, bEncrypt));
 }
 
 function string GetURLString()

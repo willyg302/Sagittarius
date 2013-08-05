@@ -16,8 +16,12 @@ public class AddAction extends Action {
         this.attributes = new ArrayList<String>();
     }
 
+    public void AddAttribute(String field, String value, boolean encrypt) {
+        attributes.add(Encrypt(field + "::" + value, encrypt));
+    }
+    
     public void AddAttribute(String field, String value) {
-        attributes.add(field + "::" + value);
+        AddAttribute(field, value, false);
     }
 
     @Override

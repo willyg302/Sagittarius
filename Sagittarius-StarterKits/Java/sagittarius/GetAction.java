@@ -20,12 +20,20 @@ public class GetAction extends Action {
         this.resultOffset = 0;
     }
 
+    public void AddFilter(String field, String value, boolean encrypt) {
+        filters.add(Encrypt(field + "::" + value, encrypt));
+    }
+    
     public void AddFilter(String field, String value) {
-        filters.add(field + "::" + value);
+        AddFilter(field, value, false);
     }
 
+    public void AddProjection(String field, boolean encrypt) {
+        projections.add((encrypt ? "~" : "") + field);
+    }
+    
     public void AddProjection(String field) {
-        projections.add(field);
+        AddProjection(field, false);
     }
 
     public void SetLimit(int rl) {

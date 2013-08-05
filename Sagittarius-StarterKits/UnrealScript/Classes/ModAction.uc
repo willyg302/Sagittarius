@@ -8,9 +8,9 @@ class ModAction extends GetAction;
 var private array<string> Modifications;
 var private bool bReturnsResults;
 
-function AddModification(string field, string value)
+function AddModification(string field, string value, optional bool bEncrypt = false)
 {
-	Modifications.AddItem(field $ "::" $ value);
+	Modifications.AddItem(Encrypt(field $ "::" $ value, bEncrypt));
 }
 
 function SetReturnsResults()

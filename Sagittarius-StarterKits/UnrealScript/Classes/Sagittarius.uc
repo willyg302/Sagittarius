@@ -7,6 +7,8 @@ class Sagittarius extends Actor;
 
 var SagittariusLinkClient Link;
 
+var private String SagPass;
+
 struct ModuleStruct
 {
 	var string ID;
@@ -27,10 +29,38 @@ var const enum ELogLevel
 } LogLevel;
 
 
-function Initialize(string THost, int TPort)
+function Initialize(string AppID, string Pass)
 {
 	Link = Spawn(class'SagittariusLinkClient');
-	Link.Initialize(self, THost, TPort);
+	Link.Initialize(self, AppID);
+	SagPass = Pass;
+}
+
+function Action CreateAction(string Type)
+{
+	local Action a;
+	if (Type == "get")
+	{
+		a = new class'GetAction';
+	}
+	else if (Type == "add")
+	{
+		a = new class'AddAction';
+	}
+	else if (Type == "mod")
+	{
+		a = new class'ModAction';
+	}
+	else if (Type == "del")
+	{
+		a = new class'DelAction';
+	}
+	else
+	{
+		return none;
+	}
+	a.SetPassword(SagPass);
+	return a;
 }
 
 function RegisterModule(Module m)
@@ -153,9 +183,10 @@ static function LogDebug(string msg, optional name cat = LOG_TAG)
 }
 
 
-static function string GetXMLValue(string XMLTag, string Text)
+function string GetXMLValue(string XMLTag, string Text)
 {
 	local int XMLTagStart, XMLTagEnd;
+	local string ret;
 	XMLTagStart = InStr(Text, "<" $ XMLTag $ ">");
 	if (XMLTagStart < 0)
 	{
@@ -167,7 +198,12 @@ static function string GetXMLValue(string XMLTag, string Text)
 	{
 		return "";
 	}
-	return Mid(Text, XMLTagStart, XMLTagEnd - XMLTagStart);
+	ret = Mid(Text, XMLTagStart, XMLTagEnd - XMLTagStart);
+	if (InStr(ret, "~") == 0)
+	{
+		ret = class'Encryption'.static.Decrypt(ret, SagPass);
+	}
+	return ret;
 }
 
 

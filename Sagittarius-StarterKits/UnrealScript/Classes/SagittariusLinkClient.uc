@@ -29,11 +29,11 @@ var array<Connection> ConnectionQueue;
 
 var Connection CurrentConnection;
 
-function Initialize(Sagittarius s, string THost, int TPort)
+function Initialize(Sagittarius s, string THost)
 {
 	Parent = s;
-	TargetHost = THost;
-	TargetPort = TPort;
+	TargetHost = THost $ ".appspot.com";
+	TargetPort = 80;
 }
 
 /**
@@ -118,6 +118,7 @@ event Opened()
 	SendText(newline);
 	SendText(newline);
 
+	Parent.LogDebug("Sent text: " $ CurrentConnection.data $ " to destination " $ CurrentConnection.dest);
 	Parent.LogDebug("End TCP connection");
 }
 
