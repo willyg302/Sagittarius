@@ -64,12 +64,12 @@ public class Sagittarius {
     /**
      * CALLBACK FUNCTIONS
      */
-    public void OnTextReceived(String ModuleID, String ActionID, String text) {
+    public void OnTextReceived(String ModuleID, String ActionID, SagResponse resp) {
         if (ModuleID.equals("builtin")) {
-            BuiltInOnTextReceived(ActionID, text);
+            BuiltInOnTextReceived(ActionID, resp);
             return;
         }
-        GetModule(ModuleID).OnTextReceived(ActionID, text);
+        GetModule(ModuleID).OnTextReceived(ActionID, resp);
     }
 
     public void OnCallbackReceived(String ModuleID, String ActionID) {
@@ -80,7 +80,7 @@ public class Sagittarius {
         GetModule(ModuleID).OnCallbackReceived(ActionID);
     }
 
-    private void BuiltInOnTextReceived(String ActionID, String text) {
+    private void BuiltInOnTextReceived(String ActionID, SagResponse resp) {
         //
     }
 
@@ -157,20 +157,7 @@ public class Sagittarius {
         }
     }
 
-    public String GetXMLValue(String XMLTag, String text) {
-        int XMLTagStart = text.indexOf("<" + XMLTag + ">");
-        if (XMLTagStart < 0) {
-            return "";
-        }
-        XMLTagStart += (XMLTag.length() + 2);
-        int XMLTagEnd = text.indexOf("</" + XMLTag + ">");
-        if (XMLTagEnd < XMLTagStart) {
-            return "";
-        }
-        String ret = text.substring(XMLTagStart, XMLTagEnd);
-        if (ret.startsWith("~")) {
-            ret = Encryption.Decrypt(ret, SagPass);
-        }
-        return ret;
+    public String decrypt(String ct) {
+        return Encryption.Decrypt(ct, SagPass);
     }
 }

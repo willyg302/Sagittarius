@@ -111,9 +111,9 @@ public class SagittariusLinkClient {
                 Sagittarius.LogDebug("Sent text: " + currentConnection.getData() + " to destination " + currentConnection.getDestination());
                 Sagittarius.LogDebug("End TCP connection");
                 if (ret != null) {
-                    String text = parent.GetXMLValue("resp", ret);
+                    String text = GetXMLValue("resp", ret);
                     Sagittarius.LogDebug("Received Text: " + text);
-                    parent.OnTextReceived(currentConnection.getModuleID(), currentConnection.getQueryID(), text);
+                    parent.OnTextReceived(currentConnection.getModuleID(), currentConnection.getQueryID(), new SagResponse(text, parent));
                 }
                 // In any case, our connection is done
                 Sagittarius.LogInfo("TCP connection closed for module " + currentConnection.getModuleID() + " and query " + currentConnection.getQueryID());
@@ -125,5 +125,18 @@ public class SagittariusLinkClient {
                 return ret;
             }
         });
+    }
+    
+    private String GetXMLValue(String XMLTag, String text) {
+        int XMLTagStart = text.indexOf("<" + XMLTag + ">");
+        if (XMLTagStart < 0) {
+            return "";
+        }
+        XMLTagStart += (XMLTag.length() + 2);
+        int XMLTagEnd = text.indexOf("</" + XMLTag + ">");
+        if (XMLTagEnd < XMLTagStart) {
+            return "";
+        }
+        return text.substring(XMLTagStart, XMLTagEnd);
     }
 }

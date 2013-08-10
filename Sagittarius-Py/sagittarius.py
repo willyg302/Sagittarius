@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 # coding: utf-8
 
-import os, urllib, jinja2, webapp2
+import os, urllib, jinja2, webapp2, json
 from google.appengine.api import users, mail, app_identity
 from google.appengine.ext import ndb
 
@@ -35,8 +35,9 @@ class MainPage(webapp2.RequestHandler):
 		self.response.write(template.render(template_values))
 
 
+# Returns a dictionary with the requested object properties (or all if none specified)
 def getObjectProperties(obj, projections):
-	ret = ''
+	ret = {}
 	if not projections:
 		projections = obj._properties.keys()
 	for p in projections:
@@ -44,8 +45,8 @@ def getObjectProperties(obj, projections):
 		if p.startswith('~'):
 			p = p[1:]
 			prop = encrypt.encrypt(prop, SAGPASS)
-		ret += ("<" + p + ">" + prop + "</" + p + ">")
-	return (ret + "\n")
+		ret[p] = prop
+	return ret
 
 def generateQuery(filters):
 	q = DBObject.query()
@@ -61,14 +62,12 @@ def generateQuery(filters):
 class GetAction(webapp2.RequestHandler):
 
 	def post(self):
-		ret = ''
+		ret = {}
+		dbobjects = []
+
 		limit = int(self.request.get('rlim', '20'))
 		offset = int(self.request.get('roff', '0'))
-
-		# Our optional filters (possibly none at all)
 		filters = self.request.get_all('f')
-
-		# Projections (possibly none)
 		projections = self.request.get_all('p')
 
 		# Generate and run query
@@ -76,16 +75,18 @@ class GetAction(webapp2.RequestHandler):
 
 		# Iterate over results
 		for obj in q.iter(limit=limit, offset=offset):
-			ret += getObjectProperties(obj, projections)
+			dbobjects.append(getObjectProperties(obj, projections))
 
 		# Send response to user!
-		self.response.write("<resp>" + ret + "</resp>")
+		ret['success'] = 'y' # Currently we just default to this being successful
+		ret['dbobjects'] = dbobjects
+		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
 
 
 class AddAction(webapp2.RequestHandler):
 
 	def post(self):
-		ret = ''
+		ret = {}
 
 		# Object attributes specified (if none, we add a "default object")
 		attributes = self.request.get_all('a')
@@ -102,28 +103,22 @@ class AddAction(webapp2.RequestHandler):
 			setattr(obj, parts[0], parts[1])
 		obj.put()
 
-		# Generate a quick response (commented out for now since we don't want to expose encrypted fields)
-		self.response.write('<resp>Success!</resp>')
-		#for k in obj._properties.keys():
-		#	ret += ("<" + k + ">" + str(getattr(obj, k, 'null')) + "</" + k + ">")
-		#self.response.write("<resp>Added object: " + ret + "</resp>")
+		# Generate a quick response (for now, just success)
+		ret['success'] = 'y'
+		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
 
 
 class ModAction(webapp2.RequestHandler):
 
 	def post(self):
-		ret = ''
+		ret = {}
+		dbobjects = []
+
 		limit = int(self.request.get('rlim', '20'))
 		offset = int(self.request.get('roff', '0'))
-
-		# Our optional filters (possibly none at all)
 		filters = self.request.get_all('f')
-
-		# Projections (possibly none), and whether to return results at all
 		projections = self.request.get_all('p')
 		bReturn = self.request.get('rres', 'false')
-
-		# Modifications to make (possibly none)
 		modifications = self.request.get_all('m')
 
 		# Generate and run query
@@ -139,28 +134,27 @@ class ModAction(webapp2.RequestHandler):
 				setattr(obj, parts[0], parts[1])
 			#obj.put() # See below
 			if bReturn != 'false':
-				ret += getObjectProperties(obj, projections)
+				dbobjects.append(getObjectProperties(obj, projections))
 
 		# Batch-put (this ensures near-atomicity)
 		ndb.put_multi(results)
 
 		# Send response to user!
-		if ret == '':
-			ret = 'Success!'
-		self.response.write("<resp>" + ret + "</resp>")
+		ret['success'] = 'y' # Currently we just default to this being successful
+		if bReturn != 'false':
+			ret['dbobjects'] = dbobjects
+		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
 
 
 class DelAction(webapp2.RequestHandler):
 
 	def post(self):
-		ret = ''
+		ret = {}
+		dbobjects = []
+
 		limit = int(self.request.get('rlim', '20'))
 		offset = int(self.request.get('roff', '0'))
-
-		# Our optional filters (possibly none at all)
 		filters = self.request.get_all('f')
-
-		# Projections (possibly none), and whether to return results at all
 		projections = self.request.get_all('p')
 		bReturn = self.request.get('rres', 'false')
 
@@ -171,15 +165,16 @@ class DelAction(webapp2.RequestHandler):
 		results = q.fetch(limit, offset=offset)
 		if bReturn != 'false':
 			for obj in results:
-				ret += getObjectProperties(obj, projections)
+				dbobjects.append(getObjectProperties(obj, projections))
 
 		# Batch-delete (this ensures near-atomicity)
 		ndb.delete_multi([r.key for r in results])
 
 		# Send response to user!
-		if ret == '':
-			ret = 'Success!'
-		self.response.write("<resp>" + ret + "</resp>")
+		ret['success'] = 'y' # Currently we just default to this being successful
+		if bReturn != 'false':
+			ret['dbobjects'] = dbobjects
+		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
 
 
 class SendMail(webapp2.RequestHandler):

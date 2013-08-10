@@ -134,10 +134,30 @@ event Closed()
 
 event ReceivedText(string Text)
 {
+	local SagResponse resp;
 	// We store the response between <resp></resp> XML tags, so we grab it here
-	Text = Parent.GetXMLValue("resp", Text);
+	Text = GetXMLValue("resp", Text);
 	Parent.LogDebug("Received Text: " $ Text);
-	Parent.OnTextReceived(CurrentConnection.mID, CurrentConnection.qID, Text);
+	resp = new class'SagResponse';
+	resp.Decode(Text, Parent);
+	Parent.OnTextReceived(CurrentConnection.mID, CurrentConnection.qID, resp);
+}
+
+private function string GetXMLValue(string XMLTag, string Text)
+{
+	local int XMLTagStart, XMLTagEnd;
+	XMLTagStart = InStr(Text, "<" $ XMLTag $ ">");
+	if (XMLTagStart < 0)
+	{
+		return "";
+	}
+	XMLTagStart += (Len(XMLTag) + 2);
+	XMLTagEnd = InStr(Text, "</" $ XMLTag $ ">");
+	if (XMLTagEnd < XMLTagStart)
+	{
+		return "";
+	}
+	return Mid(Text, XMLTagStart, XMLTagEnd - XMLTagStart);
 }
 
 

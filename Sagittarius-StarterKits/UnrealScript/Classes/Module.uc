@@ -19,7 +19,7 @@ function SubmitAction(string ActionID, Action a)
 	Parent.SubmitAction(ID, ActionID, a);
 }
 
-function OnTextReceived(string ActionID, string Text)
+function OnTextReceived(string ActionID, SagResponse resp)
 {
 	// When any text is received from remote service
 }

@@ -22,7 +22,7 @@ public abstract class Module {
         parent.SubmitAction(ID, ActionID, a);
     }
 
-    public abstract void OnTextReceived(String ActionID, String text);
+    public abstract void OnTextReceived(String ActionID, SagResponse resp);
 
     public abstract void OnCallbackReceived(String ActionID);
 }

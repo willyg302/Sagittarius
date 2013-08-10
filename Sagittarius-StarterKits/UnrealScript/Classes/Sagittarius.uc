@@ -98,14 +98,14 @@ function SubmitAction(string ModuleID, string ActionID, Action a)
 
 /** CALLBACK FUNCTIONS **/
 
-function OnTextReceived(string ModuleID, string ActionID, string Text)
+function OnTextReceived(string ModuleID, string ActionID, SagResponse resp)
 {
 	if (ModuleID == "builtin")
 	{
-		BuiltInOnTextReceived(ActionID, Text);
+		BuiltInOnTextReceived(ActionID, resp);
 		return;
 	}
-	GetModule(ModuleID).OnTextReceived(ActionID, Text);
+	GetModule(ModuleID).OnTextReceived(ActionID, resp);
 }
 
 function OnCallbackReceived(string ModuleID, string ActionID)
@@ -118,7 +118,7 @@ function OnCallbackReceived(string ModuleID, string ActionID)
 	GetModule(ModuleID).OnCallbackReceived(ActionID);
 }
 
-function BuiltInOnTextReceived(string ActionID, string Text)
+function BuiltInOnTextReceived(string ActionID, SagResponse resp)
 {
 	//
 }
@@ -134,7 +134,7 @@ function BuiltInOnCallbackReceived(string ActionID)
 
 
 
-/** MAIL **/
+/** SPECIAL FUNCTIONS **/
 
 function SendMail(string Receiver, string Subject, string Message, optional string Sender = "")
 {
@@ -146,6 +146,14 @@ function SendMail(string Receiver, string Subject, string Message, optional stri
 	}
 	Link.Transmit(true, "/mail", "builtin", "mail", Contents);
 }
+
+function string GetLocalIP()
+{
+	local IpAddr IP;
+	Link.GetLocalIP(IP);
+	return Link.IpAddrToString(IP);
+}
+
 
 
 /** LOG FUNCTIONS **/
@@ -183,27 +191,9 @@ static function LogDebug(string msg, optional name cat = LOG_TAG)
 }
 
 
-function string GetXMLValue(string XMLTag, string Text)
+function string Decrypt(string ct)
 {
-	local int XMLTagStart, XMLTagEnd;
-	local string ret;
-	XMLTagStart = InStr(Text, "<" $ XMLTag $ ">");
-	if (XMLTagStart < 0)
-	{
-		return "";
-	}
-	XMLTagStart += (Len(XMLTag) + 2);
-	XMLTagEnd = InStr(Text, "</" $ XMLTag $ ">");
-	if (XMLTagEnd < XMLTagStart)
-	{
-		return "";
-	}
-	ret = Mid(Text, XMLTagStart, XMLTagEnd - XMLTagStart);
-	if (InStr(ret, "~") == 0)
-	{
-		ret = class'Encryption'.static.Decrypt(ret, SagPass);
-	}
-	return ret;
+	return class'Encryption'.static.Decrypt(ct, SagPass);
 }
 
 

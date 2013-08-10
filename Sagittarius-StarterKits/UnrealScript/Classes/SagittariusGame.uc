@@ -19,6 +19,6 @@ event PreBeginPlay()
 DefaultProperties
 {
 	bDelayedStart=false
-	SagittariusAppID="[APP ID HERE].appspot.com"
+	SagittariusAppID="[APP ID HERE]"
 	SagittariusPass="[APP PASSWORD HERE]"
 }

@@ -3,10 +3,9 @@ __author__ = "William Gaul"
 __copyright__ = "Copyright 2013 WillyG Productions"
 
 
+import ttk, webbrowser, httplib, urllib, json
 from Tkinter import *
-import ttk
 from PIL import ImageTk
-import webbrowser, httplib, urllib
 
 import encrypt
 
@@ -389,7 +388,15 @@ class SagittariusWizard(ttk.Frame):
         data = response.read()
         conn.close()
 
-        # Print response
+        # Print response (Also decrypts encrypted responses)
+        if '<resp>' in data:
+            jsonData = json.loads(data[6:][:-7]) # Strip <resp> tags
+            if jsonData.get('dbobjects'):
+                for dbobject in jsonData['dbobjects']:
+                    for key, val in dbobject.iteritems():
+                        if val.startswith('~'):
+                            dbobject[key] = encrypt.decrypt(val, self.password.get())
+            data = json.dumps(jsonData, indent=4) # Pretty-print the JSON
         self.text.insert(END, "Received data: " + data + "\n")
 
     def openBox(self, button):

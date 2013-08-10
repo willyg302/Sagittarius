@@ -21,6 +21,12 @@ Sagittarius is a powerful and free online game service built with [Google App En
 
 [Sagittarius Wiki](http://willyg302.github.io/Sagittarius/)
 
+## Feature Request
+
+Got a feature you'd like to see in Sagittarius? You can submit a feature request by adding a [new issue](https://github.com/willyg302/Sagittarius/issues?state=open) to the repo. Just be sure to tag it with the label "enhancement".
+
+Of course, if you really _do_ find an issue, feel free to submit it!
+
 ## Disclaimer
 
 __You can download and modify this repository ("repo") in any way you see fit, as long as:__
