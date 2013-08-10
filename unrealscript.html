@@ -85,9 +85,9 @@ message="Welcome to my game, have fun playing!"
 <pre class="prettyprint linenums pre-scrollable">
 class MOTDModule extends Module;
 
-function OnTextReceived(string ActionID, string Text)
+function OnTextReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, Text);
+	super.OnTextReceived(ActionID, resp);
 	// When any text is received from remote service
 }
 
@@ -117,9 +117,9 @@ function RegisterOnMOTDReceivedDelegate(delegate&lt;OnMOTDReceivedDelegate&gt; d
 	OnMOTDReceivedDelegate = del;
 }
 
-function OnTextReceived(string ActionID, string Text)
+function OnTextReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, Text);
+	super.OnTextReceived(ActionID, resp);
 	// When any text is received from remote service
 }
 
@@ -174,9 +174,9 @@ function QueryMOTD()
 	// @TODO
 }
 
-function OnTextReceived(string ActionID, string Text)
+function OnTextReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, Text);
+	super.OnTextReceived(ActionID, resp);
 	// When any text is received from remote service
 }
 
@@ -229,10 +229,10 @@ function QueryMOTD()
 	SubmitAction("motdquery", ga);
 }
 
-function OnTextReceived(string ActionID, string Text)
+function OnTextReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, Text);
-	motd = Parent.GetXMLValue("message", Text);
+	super.OnTextReceived(ActionID, resp);
+	motd = resp.GetValue("message");
 }
 
 function OnCallbackReceived(string ActionID)
@@ -247,7 +247,7 @@ DefaultProperties
 }
 </pre>
 					<p>Our added code shows how to make use of the actions bundled with the starter kit. First, we create a new instance of GetAction. Then we add our filters and projections to it. We only want to get the DBObject with <code>object_type=="motd"</code> and <code>object_name=="motd"</code>, so we add those filters using the special shortcut variables <code>DBTYPE</code> and <code>DBNAME</code> respectively. We only want to return the actual <i>message</i>, so we add a projection for that field. Since we expect there to be only one MOTD, we make the query unique. And finally, we submit the GetAction and assign it an ID of <code>"motdquery"</code> so that it can be identified later.</p>
-					<p>Any time that Sagittarius receives a reply from the server, the text will be routed to <code>OnTextReceived()</code>. Therefore it is here that we want to parse the MOTD message and assign it to our local cache. Replies are XML-encoded, so we know the MOTD message will be wrapped by <code>&lt;message&gt;</code> tags. We get this value using the special function <code>GetXMLValue()</code>, and our module is complete.</p>
+					<p>Any time that Sagittarius receives a reply from the server, the text will be routed to <code>OnTextReceived()</code>. Therefore it is here that we want to parse the MOTD message and assign it to our local cache. Replies are encoded as a special SagResponse object, which provides a convenient <code>GetValue()</code> function to return the first value matching the specified key. Once we do that, our module is complete.</p>
 
 					<h2 id="using-our-motd-module">Using Our MOTD Module</h2>
 					<p>Since this is a simple tutorial, we'll just modify <code>SagittariusGame.uc</code> to fetch the MOTD one second after a level has been loaded and broadcast it to all players. In a more realistic scenario you'd probably fetch the MOTD upon startup and integrate the message into a menu or HUD element. Our modifications are as follows:</p>
@@ -304,6 +304,9 @@ function PrintMOTD()
 function SendMail(string Receiver, string Subject, string Message, optional string Sender = "")
 </pre>
 					<p>The Sender parameter is a string referencing the subdomain of your application that you want the email to be sent from. For example, if your <code>Application Identifier</code> is &ldquo;myapplication&rdquo; and your Sender parameter is set to &ldquo;donuts&rdquo;, then the recipient will receive an email from <strong>donuts@myapplication.appspotmail.com</strong>. Note that you do not have to specify a Sender; if you don't, it will default to &ldquo;admin&rdquo;.</p>
+
+					<h2 id="getting-the-local-ip">Getting the Local IP</h2>
+					<p>You can get the local IP address (that is, the IP of the player's computer) at any time by using the <code>GetLocalIP()</code> function in <code>Sagittarius.ic</code>. The IP is returned as a string.</p>
 				</section>
 
 				<section id="logging">
