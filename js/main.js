@@ -9,6 +9,7 @@ function printNav(page) {
 	document.write("<li class=\"" + ((page == "Home") ? "active" : "") + "\"><a href=\"index.html\">Home</a></li>");
 	document.write("<li class=\"" + ((page == "Downloads") ? "active" : "") + "\"><a href=\"downloads.html\">Downloads</a></li>");
 	document.write("<li class=\"" + ((page == "Starter Kits") ? "active" : "") + "\"><a href=\"starter-kits.html\">Starter Kits</a></li>");
+	document.write("<li class=\"" + ((page == "Modules") ? "active" : "") + "\"><a href=\"modules.html\">Modules</a></li>");
 	document.write("<li class=\"" + ((page == "Getting Started") ? "active" : "") + "\"><a href=\"getting-started.html\">Getting Started</a></li>");
 	document.write("</ul></div></div></div></div>");
 }
