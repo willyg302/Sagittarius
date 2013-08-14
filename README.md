@@ -12,6 +12,7 @@ Sagittarius is a powerful and free online game service built with [Google App En
 
 - [Sagittarius-Py](https://github.com/willyg302/Sagittarius/tree/master/Sagittarius-Py): the working directory of the end-user backend part of Sagittarius, which is replicated over to the official release at every build
 - [Sagittarius-StarterKits](https://github.com/willyg302/Sagittarius/tree/master/Sagittarius-StarterKits): source collection of available starter kits for Sagittarius
+- [Sagittarius-Modules](https://github.com/willyg302/Sagittarius/tree/master/Sagittarius-Modules): a collection of plug-and-play modules for Sagittarius
 - [Sagittarius-Wizard](https://github.com/willyg302/Sagittarius/tree/master/Sagittarius-Wizard): source and assets for the Sagittarius Wizard (requires PIL or Pillow to run)
 - [Media](https://github.com/willyg302/Sagittarius/tree/master/Media): logos, wallpapers, and other miscellaneous media
 
