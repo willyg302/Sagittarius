@@ -187,6 +187,91 @@ class SendMail(webapp2.RequestHandler):
 		mail.send_mail(sender + "@" + app_identity.get_application_id() + ".appspotmail.com", receiver, subject, content)
 
 
+class Leaderboard(webapp2.RequestHandler):
+
+	def getLeaderboard(self, lb_name, limit, offset):
+		ret = {}
+		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
+		lb = q.get() # LB should be unique
+		if lb != None:
+			data = json.loads(str(getattr(lb, 'data')))
+			if (offset < len(data)):
+				upto = min(len(data), limit + offset)
+				ret['data'] = data[offset:upto]
+		ret['success'] = 'y'
+		return ret
+
+	def addLeaderboard(self, lb_name, sort, maxsize):
+		ret = {}
+		lb = DBObject()
+		setattr(lb, 'object_type', 'leaderboard')
+		setattr(lb, 'object_name', lb_name)
+		setattr(lb, 'sort', sort)
+		setattr(lb, 'maxsize', maxsize)
+		setattr(lb, 'data', '[]')
+		lb.put()
+		ret['success'] = 'y'
+		return ret
+
+	def postToLeaderboard(self, lb_name, score, scoreid):
+		ret = {}
+		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
+		lb = q.get() # LB should be unique
+		if lb != None:
+			data = json.loads(str(getattr(lb, 'data')))
+			descending = (str(getattr(lb, 'sort')) == 'desc')
+			maxsize = int(getattr(lb, 'maxsize'))
+			data.append({'score': score, 'sid': scoreid})
+			data = sorted(data, key=lambda k: k['score'], reverse=descending)[:maxsize]
+			setattr(lb, 'data', json.dumps(data, separators=(',',':')))
+			lb.put()
+		ret['success'] = 'y'
+		return ret
+
+	def purgeLeaderboard(self, lb_name):
+		ret = {}
+		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
+		lb = q.get() # LB should be unique
+		if lb != None:
+			setattr(lb, 'data', '[]')
+			lb.put()
+		ret['success'] = 'y'
+		return ret
+
+	def deleteLeaderboard(self, lb_name):
+		ret = {}
+		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
+		lb = q.get() # LB should be unique
+		if lb != None:
+			lb.key.delete()
+		ret['success'] = 'y'
+		return ret
+
+	def post(self):
+		ret = {}
+		action = self.request.get('act')
+		lb_name = self.request.get('n', 'leaderboard')
+
+		if action == 'get':
+			limit = int(self.request.get('rlim', '20'))
+			offset = int(self.request.get('roff', '0'))
+			ret = self.getLeaderboard(lb_name, limit, offset)
+		elif action == 'add':
+			sort = self.request.get('s', 'desc')
+			maxsize = int(self.request.get('m', '50'))
+			ret = self.addLeaderboard(lb_name, sort, maxsize)
+		elif action == 'post':
+			score = int(self.request.get('score'))
+			scoreid = self.request.get('sid')
+			ret = self.postToLeaderboard(lb_name, score, scoreid)
+		elif action == 'purge':
+			ret = self.purgeLeaderboard(lb_name)
+		elif action == 'del':
+			ret = self.deleteLeaderboard(lb_name)
+
+		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
+
+
 application = webapp2.WSGIApplication([
 	('/', MainPage),
 	('/index.html', MainPage),
@@ -195,4 +280,5 @@ application = webapp2.WSGIApplication([
 	('/dbmod', ModAction),
 	('/dbdel', DelAction),
 	('/mail', SendMail),
+	('/ldbds', Leaderboard),
 ], debug=True)
