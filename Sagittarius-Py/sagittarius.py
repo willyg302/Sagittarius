@@ -58,10 +58,15 @@ def generateQuery(filters):
 	#q = q.order(-DBObject.date) # We can't do this because only simple queries are allowed on Expandos
 	return q
 
+def enableCORS(requestHandler):
+	requestHandler.response.headers['Access-Control-Allow-Origin'] = '*'
+	requestHandler.response.headers['Access-Control-Allow-Methods'] = 'POST'
+
 
 class GetAction(webapp2.RequestHandler):
 
 	def post(self):
+		enableCORS(self)
 		ret = {}
 		dbobjects = []
 
@@ -86,6 +91,7 @@ class GetAction(webapp2.RequestHandler):
 class AddAction(webapp2.RequestHandler):
 
 	def post(self):
+		enableCORS(self)
 		ret = {}
 
 		# Object attributes specified (if none, we add a "default object")
@@ -111,6 +117,7 @@ class AddAction(webapp2.RequestHandler):
 class ModAction(webapp2.RequestHandler):
 
 	def post(self):
+		enableCORS(self)
 		ret = {}
 		dbobjects = []
 
@@ -149,6 +156,7 @@ class ModAction(webapp2.RequestHandler):
 class DelAction(webapp2.RequestHandler):
 
 	def post(self):
+		enableCORS(self)
 		ret = {}
 		dbobjects = []
 
@@ -180,6 +188,7 @@ class DelAction(webapp2.RequestHandler):
 class SendMail(webapp2.RequestHandler):
 
 	def post(self):
+		enableCORS(self)
 		subject = self.request.get('subj')
 		content = self.request.get('mesg')
 		sender = self.request.get('send', 'admin')
@@ -248,6 +257,7 @@ class Leaderboard(webapp2.RequestHandler):
 		return ret
 
 	def post(self):
+		enableCORS(self)
 		ret = {}
 		action = self.request.get('act')
 		lb_name = self.request.get('n', 'leaderboard')
