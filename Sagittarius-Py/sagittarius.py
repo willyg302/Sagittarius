@@ -6,6 +6,7 @@ from google.appengine.api import users, mail, app_identity
 from google.appengine.ext import ndb
 
 import encrypt
+from utils import DynamicPropertyMixin
 
 
 JINJA_ENVIRONMENT = jinja2.Environment(
@@ -18,7 +19,7 @@ DEFAULT_DBOBJECT_NAME = 'null'
 SAGPASS = os.environ.get('SAGITTARIUS_PASSWORD', 'password')
 
 
-class DBObject(ndb.Expando):
+class DBObject(ndb.Expando, DynamicPropertyMixin):
 	"""The base model for an object in our database."""
 	object_type = ndb.StringProperty()
 	object_name = ndb.StringProperty()
@@ -217,7 +218,7 @@ class Leaderboard(webapp2.RequestHandler):
 		setattr(lb, 'object_name', lb_name)
 		setattr(lb, 'sort', sort)
 		setattr(lb, 'maxsize', maxsize)
-		setattr(lb, 'data', '[]')
+		lb.set_text_prop('data', '[]')
 		lb.put()
 		ret['success'] = 'y'
 		return ret
@@ -232,7 +233,8 @@ class Leaderboard(webapp2.RequestHandler):
 			maxsize = int(getattr(lb, 'maxsize'))
 			data.append({'score': score, 'sid': scoreid})
 			data = sorted(data, key=lambda k: k['score'], reverse=descending)[:maxsize]
-			setattr(lb, 'data', json.dumps(data, separators=(',',':')))
+			#setattr(lb, 'data', json.dumps(data, separators=(',',':')))
+			lb.set_text_prop('data', json.dumps(data, separators=(',',':')))
 			lb.put()
 		ret['success'] = 'y'
 		return ret
@@ -242,7 +244,8 @@ class Leaderboard(webapp2.RequestHandler):
 		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
 		lb = q.get() # LB should be unique
 		if lb != None:
-			setattr(lb, 'data', '[]')
+			#setattr(lb, 'data', '[]')
+			lb.set_text_prop('data', '[]')
 			lb.put()
 		ret['success'] = 'y'
 		return ret
