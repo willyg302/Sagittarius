@@ -195,6 +195,10 @@ class SendMail(webapp2.RequestHandler):
 		sender = self.request.get('send', 'admin')
 		receiver = self.request.get('recv')
 		mail.send_mail(sender + "@" + app_identity.get_application_id() + ".appspotmail.com", receiver, subject, content)
+		# Send a quick success response (in reality, we should probably kick back errors, if any)
+		ret = {}
+		ret['success'] = 'y'
+		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
 
 
 class Leaderboard(webapp2.RequestHandler):
