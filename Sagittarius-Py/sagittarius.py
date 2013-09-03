@@ -63,6 +63,11 @@ def enableCORS(requestHandler):
 	requestHandler.response.headers['Access-Control-Allow-Origin'] = '*'
 	requestHandler.response.headers['Access-Control-Allow-Methods'] = 'POST'
 
+def get(request, argument_name, default_value=''):
+	ret = request.get(argument_name, default_value)
+	if ret.startswith('~'):
+		ret = encrypt.decrypt(f, SAGPASS)
+
 
 class GetAction(webapp2.RequestHandler):
 
