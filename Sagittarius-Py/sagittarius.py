@@ -37,6 +37,7 @@ class MainPage(webapp2.RequestHandler):
 
 
 # Returns a dictionary with the requested object properties (or all if none specified)
+# Note that this is where END TILDES are handled
 def getObjectProperties(obj, projections):
 	ret = {}
 	if not projections:
@@ -52,28 +53,54 @@ def getObjectProperties(obj, projections):
 def generateQuery(filters):
 	q = DBObject.query()
 	for f in filters:
-		if f.startswith('~'):
-			f = encrypt.decrypt(f, SAGPASS)
 		parts = f.split('::')
 		q = q.filter(ndb.GenericProperty(parts[0]) == parts[1])
 	#q = q.order(-DBObject.date) # We can't do this because only simple queries are allowed on Expandos
 	return q
 
-def enableCORS(requestHandler):
-	requestHandler.response.headers['Access-Control-Allow-Origin'] = '*'
-	requestHandler.response.headers['Access-Control-Allow-Methods'] = 'POST'
 
-def get(request, argument_name, default_value=''):
-	ret = request.get(argument_name, default_value)
-	if ret.startswith('~'):
-		ret = encrypt.decrypt(f, SAGPASS)
+class Request(webapp2.Request):
+
+	def preprocess_value(self, value):
+		if value.startswith('~'):
+			value = encrypt.decrypt(value, SAGPASS)
+		# Mustache substitutions!
+		value = value.replace('{{IP}}', self.remote_addr)
+		return value
+
+	def get(self, argument_name, default_value='', allow_multiple=False):
+		ret = super(Request, self).get(argument_name, default_value)
+		ret = self.preprocess_value(ret)
+		return ret
+
+	def get_all(self, argument_name, default_value=None):
+		ret = super(Request, self).get_all(argument_name, default_value)
+		for r in ret:
+			r = self.preprocess_value(r)
+		return ret
 
 
-class GetAction(webapp2.RequestHandler):
+class RequestHandler(webapp2.RequestHandler):
+
+	def __init__(self, request=None, response=None):
+		super(RequestHandler, self).__init__(request, response)
+		self.response_obj = {'success': 'y'} # We say that we are successful by default
 
 	def post(self):
-		enableCORS(self)
-		ret = {}
+		self.response.headers['Access-Control-Allow-Origin'] = '*'
+		self.response.headers['Access-Control-Allow-Methods'] = 'POST'
+
+	def fail(self, msg):
+		self.response_obj['success'] = msg
+
+	def send_response(self):
+		self.response.write(json.dumps(self.response_obj, separators=(',',':')))
+
+
+class GetAction(RequestHandler):
+
+	def post(self):
+		super(GetAction, self).post()
 		dbobjects = []
 
 		limit = int(self.request.get('rlim', '20'))
@@ -81,24 +108,18 @@ class GetAction(webapp2.RequestHandler):
 		filters = self.request.get_all('f')
 		projections = self.request.get_all('p')
 
-		# Generate and run query
 		q = generateQuery(filters)
-
-		# Iterate over results
 		for obj in q.iter(limit=limit, offset=offset):
 			dbobjects.append(getObjectProperties(obj, projections))
 
-		# Send response to user!
-		ret['success'] = 'y' # Currently we just default to this being successful
-		ret['dbobjects'] = dbobjects
-		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
+		self.response_obj['dbobjects'] = dbobjects
+		self.send_response()
 
 
-class AddAction(webapp2.RequestHandler):
+class AddAction(RequestHandler):
 
 	def post(self):
-		enableCORS(self)
-		ret = {}
+		super(AddAction, self).post()
 
 		# Object attributes specified (if none, we add a "default object")
 		attributes = self.request.get_all('a')
@@ -106,25 +127,19 @@ class AddAction(webapp2.RequestHandler):
 			attributes.append('object_type::' + DEFAULT_DBOBJECT_TYPE)
 			attributes.append('object_name::' + DEFAULT_DBOBJECT_NAME)
 
-		# Create our object
 		obj = DBObject()
 		for a in attributes:
-			if a.startswith('~'):
-				a = encrypt.decrypt(a, SAGPASS)
 			parts = a.split('::')
 			setattr(obj, parts[0], parts[1])
 		obj.put()
 
-		# Generate a quick response (for now, just success)
-		ret['success'] = 'y'
-		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
+		self.send_response()
 
 
-class ModAction(webapp2.RequestHandler):
+class ModAction(RequestHandler):
 
 	def post(self):
-		enableCORS(self)
-		ret = {}
+		super(ModAction, self).post()
 		dbobjects = []
 
 		limit = int(self.request.get('rlim', '20'))
@@ -134,15 +149,12 @@ class ModAction(webapp2.RequestHandler):
 		bReturn = self.request.get('rres', 'false')
 		modifications = self.request.get_all('m')
 
-		# Generate and run query
 		q = generateQuery(filters)
 
 		# Iterate over results and make modifications (We use fetch here because we're modifying in-loop)
 		results = q.fetch(limit, offset=offset)
 		for obj in results:
 			for m in modifications:
-				if m.startswith('~'):
-					m = encrypt.decrypt(m, SAGPASS)
 				parts = m.split('::')
 				setattr(obj, parts[0], parts[1])
 			#obj.put() # See below
@@ -152,18 +164,15 @@ class ModAction(webapp2.RequestHandler):
 		# Batch-put (this ensures near-atomicity)
 		ndb.put_multi(results)
 
-		# Send response to user!
-		ret['success'] = 'y' # Currently we just default to this being successful
 		if bReturn != 'false':
-			ret['dbobjects'] = dbobjects
-		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
+			self.response_obj['dbobjects'] = dbobjects
+		self.send_response()
 
 
-class DelAction(webapp2.RequestHandler):
+class DelAction(RequestHandler):
 
 	def post(self):
-		enableCORS(self)
-		ret = {}
+		super(DelAction, self).post()
 		dbobjects = []
 
 		limit = int(self.request.get('rlim', '20'))
@@ -172,7 +181,6 @@ class DelAction(webapp2.RequestHandler):
 		projections = self.request.get_all('p')
 		bReturn = self.request.get('rres', 'false')
 
-		# Generate and run query
 		q = generateQuery(filters)
 
 		# Iterate over results (We use fetch here because we batch-delete after)
@@ -184,44 +192,39 @@ class DelAction(webapp2.RequestHandler):
 		# Batch-delete (this ensures near-atomicity)
 		ndb.delete_multi([r.key for r in results])
 
-		# Send response to user!
-		ret['success'] = 'y' # Currently we just default to this being successful
 		if bReturn != 'false':
-			ret['dbobjects'] = dbobjects
-		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
+			self.response_obj['dbobjects'] = dbobjects
+		self.send_response()
 
 
-class SendMail(webapp2.RequestHandler):
+class SendMail(RequestHandler):
 
 	def post(self):
-		enableCORS(self)
+		super(SendMail, self).post()
+
 		subject = self.request.get('subj')
 		content = self.request.get('mesg')
 		sender = self.request.get('send', 'admin')
 		receiver = self.request.get('recv')
+
 		mail.send_mail(sender + "@" + app_identity.get_application_id() + ".appspotmail.com", receiver, subject, content)
+
 		# Send a quick success response (in reality, we should probably kick back errors, if any)
-		ret = {}
-		ret['success'] = 'y'
-		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
+		self.send_response()
 
 
-class Leaderboard(webapp2.RequestHandler):
+class Leaderboard(RequestHandler):
 
 	def getLeaderboard(self, lb_name, limit, offset):
-		ret = {}
 		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
 		lb = q.get() # LB should be unique
 		if lb != None:
 			data = json.loads(str(getattr(lb, 'data')))
 			if (offset < len(data)):
 				upto = min(len(data), limit + offset)
-				ret['data'] = data[offset:upto]
-		ret['success'] = 'y'
-		return ret
+				self.response_obj['data'] = data[offset:upto]
 
 	def addLeaderboard(self, lb_name, sort, maxsize):
-		ret = {}
 		lb = DBObject()
 		setattr(lb, 'object_type', 'leaderboard')
 		setattr(lb, 'object_name', lb_name)
@@ -229,11 +232,8 @@ class Leaderboard(webapp2.RequestHandler):
 		setattr(lb, 'maxsize', maxsize)
 		lb.set_text_prop('data', '[]')
 		lb.put()
-		ret['success'] = 'y'
-		return ret
 
 	def postToLeaderboard(self, lb_name, score, scoreid):
-		ret = {}
 		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
 		lb = q.get() # LB should be unique
 		if lb != None:
@@ -242,56 +242,45 @@ class Leaderboard(webapp2.RequestHandler):
 			maxsize = int(getattr(lb, 'maxsize'))
 			data.append({'score': score, 'sid': scoreid})
 			data = sorted(data, key=lambda k: k['score'], reverse=descending)[:maxsize]
-			#setattr(lb, 'data', json.dumps(data, separators=(',',':')))
 			lb.set_text_prop('data', json.dumps(data, separators=(',',':')))
 			lb.put()
-		ret['success'] = 'y'
-		return ret
 
 	def purgeLeaderboard(self, lb_name):
-		ret = {}
 		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
 		lb = q.get() # LB should be unique
 		if lb != None:
-			#setattr(lb, 'data', '[]')
 			lb.set_text_prop('data', '[]')
 			lb.put()
-		ret['success'] = 'y'
-		return ret
 
 	def deleteLeaderboard(self, lb_name):
-		ret = {}
 		q = DBObject.query().filter(ndb.GenericProperty('object_type') == 'leaderboard').filter(ndb.GenericProperty('object_name') == lb_name)
 		lb = q.get() # LB should be unique
 		if lb != None:
 			lb.key.delete()
-		ret['success'] = 'y'
-		return ret
 
 	def post(self):
-		enableCORS(self)
-		ret = {}
+		super(Leaderboard, self).post()
 		action = self.request.get('act')
 		lb_name = self.request.get('n', 'leaderboard')
 
 		if action == 'get':
 			limit = int(self.request.get('rlim', '20'))
 			offset = int(self.request.get('roff', '0'))
-			ret = self.getLeaderboard(lb_name, limit, offset)
+			self.getLeaderboard(lb_name, limit, offset)
 		elif action == 'add':
 			sort = self.request.get('s', 'desc')
 			maxsize = int(self.request.get('m', '50'))
-			ret = self.addLeaderboard(lb_name, sort, maxsize)
+			self.addLeaderboard(lb_name, sort, maxsize)
 		elif action == 'post':
 			score = int(self.request.get('score'))
 			scoreid = self.request.get('sid')
-			ret = self.postToLeaderboard(lb_name, score, scoreid)
+			self.postToLeaderboard(lb_name, score, scoreid)
 		elif action == 'purge':
-			ret = self.purgeLeaderboard(lb_name)
+			self.purgeLeaderboard(lb_name)
 		elif action == 'del':
-			ret = self.deleteLeaderboard(lb_name)
+			self.deleteLeaderboard(lb_name)
 
-		self.response.write("<resp>" + json.dumps(ret, separators=(',',':')) + "</resp>")
+		self.send_response()
 
 
 application = webapp2.WSGIApplication([
@@ -304,3 +293,4 @@ application = webapp2.WSGIApplication([
 	('/mail', SendMail),
 	('/ldbds', Leaderboard),
 ], debug=True)
+application.request_class = Request
