@@ -13,76 +13,64 @@ import java.io.IOException;
 
 public class SagittariusLinkClient {
 
-    private String TargetHost;
-    private String TargetPort;
     private Sagittarius parent;
+    private String TargetHost;
     private boolean isBusy;
-    private ArrayList<Connection> connectionQueue;
-    private Connection currentConnection;
-    private AsyncHttpClient c = new AsyncHttpClient();
+    private AsyncHttpClient ahc;
+    
+    private ArrayList<SagRequest> requestQueue;
+    private SagRequest currentRequest;
 
     public SagittariusLinkClient(Sagittarius s, String THost) {
         this.parent = s;
         this.TargetHost = "http://" + THost + ".appspot.com";
-        this.TargetPort = "80";
-        this.connectionQueue = new ArrayList<Connection>();
+        this.requestQueue = new ArrayList<SagRequest>();
+        this.ahc = new AsyncHttpClient();
         this.isBusy = false;
     }
 
     /**
-     * Begins the transmission process by storing a connection in the
-     * ConnectionQueue. If the client is currently serving another connection,
-     * this connection waits in the queue until it can be taken.
-     *
-     * @param post - true if this is a POST request (false if it's a GET)
-     * @param dest - the destination webpage on the TargetHost
-     * @param mID - ID of the module that generated this transmission
-     * @param qID - ID of the query/message (for callback handling)
-     * @param data - the data to transmit, or the null string "" if no data is
-     * specified
+     * Begins the transmission process by storing a SagRequest in the
+     * requestQueue. If the client is currently serving another request, this
+     * request waits in the queue until it can be taken.
      */
-    public void Transmit(boolean post, String dest, String mID, String qID, String data) {
-        Connection conn = new Connection(post, dest, mID, qID, data);
-        connectionQueue.add(conn);
+    public void TransmitRequest(SagRequest request) {
+        requestQueue.add(request);
         if (!isBusy) {
             StartTransmission();
         }
     }
 
     private void StartTransmission() {
-        if (connectionQueue.isEmpty()) {
+        if (requestQueue.isEmpty()) {
             return;
         }
         isBusy = true;
-        currentConnection = connectionQueue.remove(0);
+        currentRequest = requestQueue.remove(0);
         parent.LogDebug("Resolving: " + TargetHost);
-        if (currentConnection.isPost()) {
-            postData();
-        }
-    }
-    
-    private void postData() {
         try {
             asyncPost();
-            Sagittarius.LogInfo("TCP connection opened for module " + currentConnection.getModuleID() + " and query " + currentConnection.getQueryID());
+            Sagittarius.LogInfo("TCP connection opened for module " + currentRequest.getModuleID() + " and query " + currentRequest.getQueryID());
         } catch (IOException ex) {
-            Sagittarius.LogError("Connection error (is server running at " + currentConnection.getDestination() + "?): " + ex.getMessage());
+            Sagittarius.LogError("Connection error (is server running at " + currentRequest.getDestination() + "?): " + ex.getMessage());
         }
     }
     
     private void asyncPost() throws IOException {
-        BoundRequestBuilder brb = c.preparePost(TargetHost + currentConnection.getDestination());
-        String[] params = currentConnection.getData().split("&");
+        BoundRequestBuilder brb = ahc.preparePost(TargetHost + currentRequest.getDestination());
+        String[] params = currentRequest.getData().split("&");
         for (String s : params) {
             String[] parts = s.split("=");
             brb.addParameter(parts[0], parts[1]);
         }
         brb.execute(new AsyncHandler<String>() {
             private ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            private String error = "";
 
             @Override
             public void onThrowable(Throwable thrwbl) {
-                Sagittarius.LogError("Connection error (is server running at " + currentConnection.getDestination() + "?): " + thrwbl.getMessage());
+                error = thrwbl.toString();
+                Sagittarius.LogError("Connection error (is server running at " + currentRequest.getDestination() + "?): " + thrwbl.getMessage());
             }
 
             @Override
@@ -94,7 +82,8 @@ public class SagittariusLinkClient {
             @Override
             public AsyncHandler.STATE onStatusReceived(HttpResponseStatus hrs) throws Exception {
                 if (hrs.getStatusCode() != 200) {
-                    Sagittarius.LogError("HTTP response status not 200");
+                    error = hrs.getStatusCode() + " " + hrs.getStatusText();
+                    Sagittarius.LogError("HTTP response status " + error);
                     return STATE.ABORT;
                 }
                 return STATE.CONTINUE;
@@ -108,16 +97,18 @@ public class SagittariusLinkClient {
             @Override
             public String onCompleted() throws Exception {
                 String ret = bytes.toString();
-                Sagittarius.LogDebug("Sent text: " + currentConnection.getData() + " to destination " + currentConnection.getDestination());
+                Sagittarius.LogDebug("Sent text: " + currentRequest.getData() + " to destination " + currentRequest.getDestination());
                 Sagittarius.LogDebug("End TCP connection");
-                if (ret != null) {
-                    String text = GetXMLValue("resp", ret);
-                    Sagittarius.LogDebug("Received Text: " + text);
-                    parent.OnTextReceived(currentConnection.getModuleID(), currentConnection.getQueryID(), new SagResponse(text, parent));
+                
+                // If nothing has been returned, we know an error has occurred
+                if (ret == null || ret.equals("")) {
+                    ret = "{\"success\":\"" + error + "\"}";
                 }
+                Sagittarius.LogDebug("Received Text: " + ret);
+                
                 // In any case, our connection is done
-                Sagittarius.LogInfo("TCP connection closed for module " + currentConnection.getModuleID() + " and query " + currentConnection.getQueryID());
-                parent.OnCallbackReceived(currentConnection.getModuleID(), currentConnection.getQueryID());
+                Sagittarius.LogInfo("TCP connection closed for module " + currentRequest.getModuleID() + " and query " + currentRequest.getQueryID());
+                parent.OnResponseReceived(currentRequest.getModuleID(), currentRequest.getQueryID(), new SagResponse(ret, parent));
                 isBusy = false;
 
                 // Retry transmission in case there are any queued messages (if not, nothing happens)
@@ -125,18 +116,5 @@ public class SagittariusLinkClient {
                 return ret;
             }
         });
-    }
-    
-    private String GetXMLValue(String XMLTag, String text) {
-        int XMLTagStart = text.indexOf("<" + XMLTag + ">");
-        if (XMLTagStart < 0) {
-            return "";
-        }
-        XMLTagStart += (XMLTag.length() + 2);
-        int XMLTagEnd = text.indexOf("</" + XMLTag + ">");
-        if (XMLTagEnd < XMLTagStart) {
-            return "";
-        }
-        return text.substring(XMLTagStart, XMLTagEnd);
     }
 }

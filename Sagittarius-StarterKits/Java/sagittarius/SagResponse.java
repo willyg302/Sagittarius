@@ -12,14 +12,15 @@ import org.json.simple.JSONValue;
 
 public class SagResponse {
     
+    private JSONObject response;
     private boolean wasSuccessful;
-    private JSONArray DBObjects;
+    private String errorMsg;
     private Sagittarius parent;
     
     public SagResponse(String text, Sagittarius s) {
-        JSONObject temp = (JSONObject) JSONValue.parse(text);
-        this.wasSuccessful = temp.get("success").equals("y");
-        this.DBObjects = (JSONArray) temp.get("dbobjects");
+        this.response = (JSONObject) JSONValue.parse(text);
+        this.wasSuccessful = response.get("success").equals("y");
+        this.errorMsg = (String) response.get("success");
         this.parent = s;
     }
     
@@ -27,7 +28,12 @@ public class SagResponse {
         return wasSuccessful;
     }
     
-    public String getValue(String key) {
+    public String getErrorMessage() {
+        return errorMsg;
+    }
+    
+    public String getDBValue(String key) {
+        JSONArray DBObjects = (JSONArray) response.get("dbobjects");
         if (DBObjects == null) {
             return "";
         }
@@ -41,7 +47,8 @@ public class SagResponse {
         return ret;
     }
     
-    public ArrayList<String> getValues(String key) {
+    public ArrayList<String> getDBValues(String key) {
+        JSONArray DBObjects = (JSONArray) response.get("dbobjects");
         ArrayList<String> ret = new ArrayList<String>();
         if (DBObjects == null) {
             return ret;
@@ -57,6 +64,6 @@ public class SagResponse {
     }
     
     public ArrayList<Object> getDBObjects() {
-        return DBObjects;
+        return (JSONArray) response.get("dbobjects");
     }
 }

@@ -5,23 +5,18 @@
  */
 package sagittarius;
 
-import java.util.ArrayList;
-
 public class GetAction extends Action {
 
     protected int resultLimit, resultOffset;
-    protected ArrayList<String> filters, projections;
 
     public GetAction() {
         this.handler = "/dbget";
-        this.filters = new ArrayList<String>();
-        this.projections = new ArrayList<String>();
         this.resultLimit = 20;
         this.resultOffset = 0;
     }
 
     public void AddFilter(String field, String value, boolean encrypt) {
-        filters.add(Encrypt(field + "::" + value, encrypt));
+        request.addURLPair("f", field + "::" + value, encrypt);
     }
     
     public void AddFilter(String field, String value) {
@@ -29,7 +24,7 @@ public class GetAction extends Action {
     }
 
     public void AddProjection(String field, boolean encrypt) {
-        projections.add((encrypt ? "~" : "") + field);
+        request.addURLPair("p", field + (encrypt ? "~" : ""), false);
     }
     
     public void AddProjection(String field) {
@@ -47,20 +42,11 @@ public class GetAction extends Action {
     public void Unique() {
         resultLimit = 1;
     }
-
+    
     @Override
-    public String GetURLString() {
-        String str = "rlim=" + resultLimit + "&roff=" + resultOffset;
-        if (!filters.isEmpty()) {
-            for (int i = 0; i < filters.size(); i++) {
-                str += ("&f=" + filters.get(i));
-            }
-        }
-        if (!projections.isEmpty()) {
-            for (int i = 0; i < projections.size(); i++) {
-                str += ("&p=" + projections.get(i));
-            }
-        }
-        return str;
+    protected void finalizeRequest() {
+        super.finalizeRequest();
+        request.addURLPair("rlim", Integer.toString(resultLimit), false);
+        request.addURLPair("roff", Integer.toString(resultOffset), false);
     }
 }

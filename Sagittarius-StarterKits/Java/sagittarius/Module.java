@@ -18,11 +18,9 @@ public abstract class Module {
         return ID;
     }
 
-    protected void SubmitAction(String ActionID, Action a) {
-        parent.SubmitAction(ID, ActionID, a);
+    protected void SubmitAction(String QueryID, Action a) {
+        a.submit(ID, QueryID);
     }
-
-    public abstract void OnTextReceived(String ActionID, SagResponse resp);
-
-    public abstract void OnCallbackReceived(String ActionID);
+    
+    public abstract void OnResponseReceived(String ActionID, SagResponse resp);
 }

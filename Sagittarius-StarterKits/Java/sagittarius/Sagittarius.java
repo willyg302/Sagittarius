@@ -41,7 +41,7 @@ public class Sagittarius {
         } else {
             return a;
         }
-        a.SetPassword(SagPass);
+        a.initializeRequest(new SagRequest(this));
         return a;
     }
 
@@ -56,35 +56,23 @@ public class Sagittarius {
         }
         return ret;
     }
-
-    public void SubmitAction(String ModuleID, String ActionID, Action a) {
-        link.Transmit(true, a.GetHandler(), ModuleID, ActionID, a.GetURLString());
+    
+    public void SubmitRequest(SagRequest sr) {
+        link.TransmitRequest(sr);
     }
 
     /**
      * CALLBACK FUNCTIONS
      */
-    public void OnTextReceived(String ModuleID, String ActionID, SagResponse resp) {
+    public void OnResponseReceived(String ModuleID, String ActionID, SagResponse resp) {
         if (ModuleID.equals("builtin")) {
-            BuiltInOnTextReceived(ActionID, resp);
+            BuiltInOnResponseReceived(ActionID, resp);
             return;
         }
-        GetModule(ModuleID).OnTextReceived(ActionID, resp);
+        GetModule(ModuleID).OnResponseReceived(ActionID, resp);
     }
-
-    public void OnCallbackReceived(String ModuleID, String ActionID) {
-        if (ModuleID.equals("builtin")) {
-            BuiltInOnCallbackReceived(ActionID);
-            return;
-        }
-        GetModule(ModuleID).OnCallbackReceived(ActionID);
-    }
-
-    private void BuiltInOnTextReceived(String ActionID, SagResponse resp) {
-        //
-    }
-
-    private void BuiltInOnCallbackReceived(String ActionID) {
+    
+    private void BuiltInOnResponseReceived(String ActionID, SagResponse resp) {
         // @TODO: Make more robust
         if (ActionID.equals("mail")) {
             LogInfo("Mail successfully sent!");
@@ -95,11 +83,14 @@ public class Sagittarius {
      * MAIL
      */
     public void SendMail(String receiver, String subject, String message, String sender) {
-        String contents = "recv" + receiver + "&subj=" + subject + "&mesg=" + message;
+        SagRequest mail = new SagRequest(this).setDestination("/mail").setModuleInfo("builtin", "mail");
+        mail.addURLPair("recv", receiver, false);
+        mail.addURLPair("subj", subject, false);
+        mail.addURLPair("mesg", message, false);
         if (!sender.equals("")) {
-            contents += ("&send=" + sender);
+            mail.addURLPair("send", sender, false);
         }
-        link.Transmit(true, "/mail", "builtin", "mail", contents);
+        SubmitRequest(mail);
     }
 
     /**
@@ -155,6 +146,10 @@ public class Sagittarius {
         if (logLevel.ordinal() > 3) {
             log(msg, cat, "DEBUG");
         }
+    }
+    
+    public String encrypt(String pt) {
+        return Encryption.Encrypt(pt, SagPass);
     }
 
     public String decrypt(String ct) {

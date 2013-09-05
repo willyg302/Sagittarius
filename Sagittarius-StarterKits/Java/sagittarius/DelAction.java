@@ -7,7 +7,7 @@ package sagittarius;
 
 public class DelAction extends GetAction {
 
-    private boolean returnsResults;
+    protected boolean returnsResults;
 
     public DelAction() {
         this.handler = "/dbdel";
@@ -17,13 +17,12 @@ public class DelAction extends GetAction {
     public void SetReturnsResults() {
         returnsResults = true;
     }
-
+    
     @Override
-    public String GetURLString() {
-        String str = super.GetURLString();
+    protected void finalizeRequest() {
+        super.finalizeRequest();
         if (returnsResults) {
-            str += "&rres=true";
+            request.addURLPair("rres", "true", false);
         }
-        return str;
     }
 }
