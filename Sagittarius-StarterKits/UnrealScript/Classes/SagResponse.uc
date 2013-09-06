@@ -5,22 +5,24 @@
  */
 class SagResponse extends Object;
 
+var private JsonObject response;
 var bool bWasSuccessful;
-var private JsonObject DBObjects;
+var string ErrorMsg;
 var Sagittarius Parent;
 
 function Decode(string Text, Sagittarius s)
 {
-	local JsonObject temp;
-	temp = class'JsonObject'.static.DecodeJson(Text);
-	bWasSuccessful = (temp.GetStringValue("success") == "y");
-	DBObjects = temp.GetObject("dbobjects");
+	response = class'JsonObject'.static.DecodeJson(Text);
+	bWasSuccessful = (response.GetStringValue("success") == "y");
+	ErrorMsg = response.GetStringValue("success");
 	Parent = s;
 }
 
 function string GetValue(string key)
 {
 	local string ret;
+	local JsonObject DBObjects;
+	DBObjects = response.GetObject("dbobjects");
 	if (DBObjects == none)
 	{
 		return "";
@@ -42,6 +44,8 @@ function array<string> GetValues(string key)
 	local array<string> ret;
 	local string temp;
 	local int i;
+	local JsonObject DBObjects;
+	DBObjects = response.GetObject("dbobjects");
 	if (DBObjects == none)
 	{
 		return ret;
@@ -60,5 +64,5 @@ function array<string> GetValues(string key)
 
 function array<JsonObject> GetDBObjects()
 {
-	return DBObjects.ObjectArray;
+	return response.GetObject("dbobjects").ObjectArray;
 }

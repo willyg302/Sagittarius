@@ -5,22 +5,20 @@
  */
 class DelAction extends GetAction;
 
-var private bool bReturnsResults;
+var protected bool bReturnsResults;
 
 function SetReturnsResults()
 {
 	bReturnsResults = true;
 }
 
-function string GetURLString()
+protected function FinalizeRequest()
 {
-	local string str;
-	str = super.GetURLString();
+	super.FinalizeRequest();
 	if (bReturnsResults)
 	{
-		str $= "&rres=true";
+		request.AddURLPair("rres", "true", false);
 	}
-	return str;
 }
 
 DefaultProperties

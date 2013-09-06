@@ -14,17 +14,12 @@ function Initialize(Sagittarius s)
 	Parent = s;
 }
 
-function SubmitAction(string ActionID, Action a)
+function SubmitAction(string QueryID, Action a)
 {
-	Parent.SubmitAction(ID, ActionID, a);
+	a.Submit(ID, QueryID);
 }
 
-function OnTextReceived(string ActionID, SagResponse resp)
+function OnResponseReceived(string ActionID, SagResponse resp)
 {
-	// When any text is received from remote service
-}
-
-function OnCallbackReceived(string ActionID)
-{
-	// When remote transmission is fully completed
+	// When a response is received from the remote service
 }

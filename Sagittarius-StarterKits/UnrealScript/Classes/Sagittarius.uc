@@ -39,6 +39,7 @@ function Initialize(string AppID, string Pass)
 function Action CreateAction(string Type)
 {
 	local Action a;
+	local SagRequest sr;
 	if (Type == "get")
 	{
 		a = new class'GetAction';
@@ -59,7 +60,8 @@ function Action CreateAction(string Type)
 	{
 		return none;
 	}
-	a.SetPassword(SagPass);
+	sr = new class'SagRequest';
+	a.InitializeRequest(sr.Initialize(self));
 	return a;
 }
 
@@ -89,43 +91,28 @@ function Module GetModule(string ID)
 
 
 
-function SubmitAction(string ModuleID, string ActionID, Action a)
+function SubmitRequest(SagRequest sr)
 {
-	Link.Transmit(true, a.GetHandler(), ModuleID, ActionID, a.GetURLString());
+	Link.TransmitRequest(sr);
 }
 
 
 
 /** CALLBACK FUNCTIONS **/
 
-function OnTextReceived(string ModuleID, string ActionID, SagResponse resp)
+function OnResponseReceived(string ModuleID, string ActionID, SagResponse resp)
 {
 	if (ModuleID == "builtin")
 	{
-		BuiltInOnTextReceived(ActionID, resp);
+		BuiltInOnResponseReceived(ActionID, resp);
 		return;
 	}
-	GetModule(ModuleID).OnTextReceived(ActionID, resp);
+	GetModule(ModuleID).OnResponseReceived(ActionID, resp);
 }
 
-function OnCallbackReceived(string ModuleID, string ActionID)
+function BuiltInOnResponseReceived(string ActionID, SagResponse resp)
 {
-	if (ModuleID == "builtin")
-	{
-		BuiltInOnCallbackReceived(ActionID);
-		return;
-	}
-	GetModule(ModuleID).OnCallbackReceived(ActionID);
-}
-
-function BuiltInOnTextReceived(string ActionID, SagResponse resp)
-{
-	//
-}
-
-function BuiltInOnCallbackReceived(string ActionID)
-{
-	// @TODO: Test
+	// @TODO: Make more robust
 	if (ActionID == "mail")
 	{
 		class'WorldInfo'.static.GetWorldInfo().Game.Broadcast(self, "Mail successfully sent!");
@@ -138,20 +125,17 @@ function BuiltInOnCallbackReceived(string ActionID)
 
 function SendMail(string Receiver, string Subject, string Message, optional string Sender = "")
 {
-	local string Contents;
-	Contents = "recv=" $ Receiver $ "&subj=" $ Subject $ "&mesg=" $ Message;
+	local SagRequest mail;
+	mail = new class'SagRequest';
+	mail = mail.Initialize(self).SetDestination("/mail").SetModuleInfo("builtin", "mail");
+	mail.AddURLPair("recv", Receiver, false);
+	mail.AddURLPair("subj", Subject, false);
+	mail.AddURLPair("mesg", Message, false);
 	if (Sender != "")
 	{
-		Contents $= ("&send=" $ Sender);
+		mail.AddURLPair("send", Sender, false);
 	}
-	Link.Transmit(true, "/mail", "builtin", "mail", Contents);
-}
-
-function string GetLocalIP()
-{
-	local IpAddr IP;
-	Link.GetLocalIP(IP);
-	return Link.IpAddrToString(IP);
+	SubmitRequest(mail);
 }
 
 
@@ -190,6 +174,11 @@ static function LogDebug(string msg, optional name cat = LOG_TAG)
 	}
 }
 
+
+function string Encrypt(string pt)
+{
+	return class'Encryption'.static.Encrypt(pt, SagPass);
+}
 
 function string Decrypt(string ct)
 {

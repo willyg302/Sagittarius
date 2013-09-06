@@ -8,28 +8,23 @@ class Action extends Object abstract;
 const DBTYPE = "object_type";
 const DBNAME = "object_name";
 
-var private string Handler, Password;
+var protected string Handler;
+var protected SagRequest request;
 
-function SetPassword(string Pass)
+function Submit(string ModuleID, string QueryID)
 {
-	Password = Pass;
+	FinalizeRequest();
+	request.SetModuleInfo(ModuleID, QueryID);
+	request.Submit();
 }
 
-function string Encrypt(string Text, bool bEncrypt)
+function InitializeRequest(SagRequest sr)
 {
-	if (bEncrypt)
-	{
-		Text = class'Encryption'.static.Encrypt(Text, Password);
-	}
-	return Text;
+	sr.SetDestination(Handler);
+	request = sr;
 }
 
-function string GetHandler()
+protected function FinalizeRequest()
 {
-	return Handler;
-}
-
-function string GetURLString()
-{
-	return "";
+	//
 }

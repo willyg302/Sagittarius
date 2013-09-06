@@ -13,21 +13,17 @@ var int TargetPort;
  */
 var Sagittarius Parent;
 
-struct Connection
-{
-	var bool bPost;
-	var string dest, data, mID, qID;
-};
-
 // To avoid multiple TCP connections from overriding each other.
 var bool bIsBusy;
 
 /* Queue of connections to handle multiple requests and prevent them from overriding
- * each other. They are in FIFO order, so ConnectionQueue[0] is always executed next.
+ * each other. They are in FIFO order, so RequestQueue[0] is always executed next.
  */
-var array<Connection> ConnectionQueue;
+var array<SagRequest> RequestQueue;
 
-var Connection CurrentConnection;
+var SagRequest CurrentRequest;
+
+var private string CachedResponseText;
 
 function Initialize(Sagittarius s, string THost)
 {
@@ -37,25 +33,13 @@ function Initialize(Sagittarius s, string THost)
 }
 
 /**
- * Begins the transmission process by storing a connection in the ConnectionQueue. If
- * the client is currently serving another connection, this connection waits in the queue
- * until it can be taken.
- *
- * @param bPost - true if this is a POST request (false if it's a GET)
- * @param  dest - the destination webpage on the TargetHost
- * @param   mID - ID of the module that generated this transmission
- * @param   qID - ID of the query/message (for callback handling)
- * @param  data - the data to transmit, or the null string "" if no data is specified
+ * Begins the transmission process by storing a SagRequest in the
+ * RequestQueue. If the client is currently serving another request, this
+ * request waits in the queue until it can be taken.
  */
-function Transmit(bool bPost, string dest, string mID, string qID, optional string data)
+function TransmitRequest(SagRequest request)
 {
-	local Connection c;
-	c.bPost = bPost;
-	c.dest = dest;
-	c.mID = mID;
-	c.qID = qID;
-	c.data = data;
-	ConnectionQueue.AddItem(c);
+	RequestQueue.AddItem(request);
 	if (!bIsBusy)
 	{
 		StartTransmission();
@@ -64,13 +48,14 @@ function Transmit(bool bPost, string dest, string mID, string qID, optional stri
 
 function StartTransmission()
 {
-	if (ConnectionQueue.Length == 0)
+	if (RequestQueue.Length == 0)
 	{
 		return;
 	}
 	bIsBusy = true;
-	CurrentConnection = ConnectionQueue[0];
-	ConnectionQueue.Remove(0, 1);
+	CachedResponseText = "";
+	CurrentRequest = RequestQueue[0];
+	RequestQueue.Remove(0, 1);
 	Parent.LogDebug("Resolving: " $ TargetHost);
 	Resolve(TargetHost);
 }
@@ -89,7 +74,7 @@ event Resolved(IpAddr Addr)
 event ResolveFailed()
 {
 	Parent.LogError("Unable to resolve " $ TargetHost);
-	// You could retry resolving here if you have an alternative remote host.
+	// @TODO: Should return a SagResponse anyway!
 }
 
 event Opened()
@@ -97,35 +82,30 @@ event Opened()
 	local string newline;
 	newline = chr(13) $ chr(10);
 
-	Parent.LogInfo("TCP connection opened for module " $ CurrentConnection.mID $ " and query " $ CurrentConnection.qID);
+	Parent.LogInfo("TCP connection opened for module " $ CurrentRequest.mID $ " and query " $ CurrentRequest.qID);
 
-	if (CurrentConnection.bPost)
-	{
-		SendText("POST " $ CurrentConnection.dest $ " HTTP/1.0" $ newline);
-		SendText("Host: " $ TargetHost $ newline);
-		SendText("User-Agent: SagittariusLinkClient/1.0" $ newline);
-		SendText("Content-Type: application/x-www-form-urlencoded" $ newline);
-		SendText("Content-Length: " $ Len(CurrentConnection.data) $ newline);
-		SendText(newline);
-		SendText(CurrentConnection.data $ newline);
-	}
-	else
-	{
-		SendText("GET " $ CurrentConnection.dest $ CurrentConnection.data $ " HTTP/1.0" $ newline);
-		SendText("Host: " $ TargetHost $ newline);
-		SendText(newline);
-	}
+	SendText("POST " $ CurrentRequest.dest $ " HTTP/1.0" $ newline);
+	SendText("Host: " $ TargetHost $ newline);
+	SendText("User-Agent: SagittariusLinkClient/1.0" $ newline);
+	SendText("Content-Type: application/x-www-form-urlencoded" $ newline);
+	SendText("Content-Length: " $ Len(CurrentRequest.data) $ newline);
+	SendText(newline);
+	SendText(CurrentRequest.data $ newline);
 	SendText(newline);
 	SendText(newline);
 
-	Parent.LogDebug("Sent text: " $ CurrentConnection.data $ " to destination " $ CurrentConnection.dest);
+	Parent.LogDebug("Sent text: " $ CurrentRequest.data $ " to destination " $ CurrentRequest.dest);
 	Parent.LogDebug("End TCP connection");
 }
 
 event Closed()
 {
-	Parent.LogInfo("TCP connection closed for module " $ CurrentConnection.mID $ " and query " $ CurrentConnection.qID);
-	Parent.OnCallbackReceived(CurrentConnection.mID, CurrentConnection.qID);
+	local SagResponse resp;
+	Parent.LogInfo("TCP connection closed for module " $ CurrentRequest.mID $ " and query " $ CurrentRequest.qID);
+
+	resp = new class'SagResponse';
+	resp.Decode(CachedResponseText, Parent);
+	Parent.OnResponseReceived(CurrentRequest.mID, CurrentRequest.qID, resp);
 	bIsBusy = false;
 
 	// Retry transmission in case there are any queued messages (if not, nothing happens)
@@ -134,32 +114,9 @@ event Closed()
 
 event ReceivedText(string Text)
 {
-	local SagResponse resp;
-	// We store the response between <resp></resp> XML tags, so we grab it here
-	Text = GetXMLValue("resp", Text);
 	Parent.LogDebug("Received Text: " $ Text);
-	resp = new class'SagResponse';
-	resp.Decode(Text, Parent);
-	Parent.OnTextReceived(CurrentConnection.mID, CurrentConnection.qID, resp);
+	CachedResponseText $= Text;
 }
-
-private function string GetXMLValue(string XMLTag, string Text)
-{
-	local int XMLTagStart, XMLTagEnd;
-	XMLTagStart = InStr(Text, "<" $ XMLTag $ ">");
-	if (XMLTagStart < 0)
-	{
-		return "";
-	}
-	XMLTagStart += (Len(XMLTag) + 2);
-	XMLTagEnd = InStr(Text, "</" $ XMLTag $ ">");
-	if (XMLTagEnd < XMLTagStart)
-	{
-		return "";
-	}
-	return Mid(Text, XMLTagStart, XMLTagEnd - XMLTagStart);
-}
-
 
 DefaultProperties
 {

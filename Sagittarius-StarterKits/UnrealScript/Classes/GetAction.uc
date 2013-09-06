@@ -6,16 +6,15 @@
 class GetAction extends Action;
 
 var protected int ResultLimit, ResultOffset;
-var protected array<string> Filters, Projections;
 
 function AddFilter(string field, string value, optional bool bEncrypt = false)
 {
-	Filters.AddItem(Encrypt(field $ "::" $ value, bEncrypt));
+	request.AddURLPair("f", field $ "::" $ value, bEncrypt);
 }
 
 function AddProjection(string field, optional bool bEncrypt = false)
 {
-	Projections.AddItem((bEncrypt ? "~" : "") $ field);
+	request.AddURLPair("p", field $ (bEncrypt ? "~" : ""), false);
 }
 
 function SetLimit(int rl)
@@ -33,26 +32,11 @@ function Unique()
 	ResultLimit = 1;
 }
 
-function string GetURLString()
+protected function FinalizeRequest()
 {
-	local string str;
-	local int i;
-	str = "rlim=" $ ResultLimit $ "&roff=" $ ResultOffset;
-	if (Filters.Length > 0)
-	{
-		for (i = 0; i < Filters.Length; i++)
-		{
-			str $= ("&f=" $ Filters[i]);
-		}
-	}
-	if (Projections.Length > 0)
-	{
-		for (i = 0; i < Projections.Length; i++)
-		{
-			str $= ("&p=" $ Projections[i]);
-		}
-	}
-	return str;
+	super.FinalizeRequest();
+	request.AddURLPair("rlim", string(ResultLimit), false);
+	request.AddURLPair("roff", string(ResultOffset), false);
 }
 
 DefaultProperties
