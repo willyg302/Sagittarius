@@ -43,9 +43,9 @@ def getObjectProperties(obj, projections):
 	if not projections:
 		projections = obj._properties.keys()
 	for p in projections:
-		prop = str(getattr(obj, p[1:] if p.startswith('~') else p, 'null'))
-		if p.startswith('~'):
-			p = p[1:]
+		prop = str(getattr(obj, p[:-1] if p.endswith('~') else p, 'null'))
+		if p.endswith('~'):
+			p = p[:-1]
 			prop = encrypt.encrypt(prop, SAGPASS)
 		ret[p] = prop
 	return ret
@@ -68,16 +68,9 @@ class Request(webapp2.Request):
 		value = value.replace('{{IP}}', self.remote_addr)
 		return value
 
-	def get(self, argument_name, default_value='', allow_multiple=False):
-		ret = super(Request, self).get(argument_name, default_value)
-		ret = self.preprocess_value(ret)
-		return ret
-
 	def get_all(self, argument_name, default_value=None):
 		ret = super(Request, self).get_all(argument_name, default_value)
-		for r in ret:
-			r = self.preprocess_value(r)
-		return ret
+		return [self.preprocess_value(r) for r in ret]
 
 
 class RequestHandler(webapp2.RequestHandler):
@@ -283,7 +276,12 @@ class Leaderboard(RequestHandler):
 		self.send_response()
 
 
-application = webapp2.WSGIApplication([
+class Webapp(webapp2.WSGIApplication):
+
+	request_class = Request
+
+
+application = Webapp([
 	('/', MainPage),
 	('/index.html', MainPage),
 	('/dbget', GetAction),
@@ -293,4 +291,3 @@ application = webapp2.WSGIApplication([
 	('/mail', SendMail),
 	('/ldbds', Leaderboard),
 ], debug=True)
-application.request_class = Request
