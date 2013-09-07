@@ -5,6 +5,8 @@
  */
 class SagittariusLinkClient extends TcpLink;
 
+var string NEWLINE;
+
 var string TargetHost;
 var int TargetPort;
 
@@ -30,6 +32,7 @@ function Initialize(Sagittarius s, string THost)
 	Parent = s;
 	TargetHost = THost $ ".appspot.com";
 	TargetPort = 80;
+	NEWLINE = chr(13) $ chr(10);
 }
 
 /**
@@ -79,32 +82,35 @@ event ResolveFailed()
 
 event Opened()
 {
-	local string newline;
-	newline = chr(13) $ chr(10);
-
 	Parent.LogInfo("TCP connection opened for module " $ CurrentRequest.mID $ " and query " $ CurrentRequest.qID);
 
-	SendText("POST " $ CurrentRequest.dest $ " HTTP/1.0" $ newline);
-	SendText("Host: " $ TargetHost $ newline);
-	SendText("User-Agent: SagittariusLinkClient/1.0" $ newline);
-	SendText("Content-Type: application/x-www-form-urlencoded" $ newline);
-	SendText("Content-Length: " $ Len(CurrentRequest.data) $ newline);
-	SendText(newline);
-	SendText(CurrentRequest.data $ newline);
-	SendText(newline);
-	SendText(newline);
+	SendText("POST " $ CurrentRequest.dest $ " HTTP/1.0" $ NEWLINE);
+	SendText("Host: " $ TargetHost $ NEWLINE);
+	SendText("User-Agent: SagittariusLinkClient/1.0" $ NEWLINE);
+	SendText("Content-Type: application/x-www-form-urlencoded" $ NEWLINE);
+	SendText("Content-Length: " $ Len(CurrentRequest.data) $ NEWLINE);
+	SendText(NEWLINE);
+	SendText(CurrentRequest.data $ NEWLINE);
+	SendText(NEWLINE);
+	SendText(NEWLINE);
 
 	Parent.LogDebug("Sent text: " $ CurrentRequest.data $ " to destination " $ CurrentRequest.dest);
 	Parent.LogDebug("End TCP connection");
+}
+
+event ReceivedText(string Text)
+{
+	Parent.LogDebug("Received Text: " $ Text);
+	CachedResponseText $= Text;
 }
 
 event Closed()
 {
 	local SagResponse resp;
 	Parent.LogInfo("TCP connection closed for module " $ CurrentRequest.mID $ " and query " $ CurrentRequest.qID);
-
+	
 	resp = new class'SagResponse';
-	resp.Decode(CachedResponseText, Parent);
+	resp.Decode(ParseHTTPResponse(CachedResponseText), Parent);
 	Parent.OnResponseReceived(CurrentRequest.mID, CurrentRequest.qID, resp);
 	bIsBusy = false;
 
@@ -112,10 +118,40 @@ event Closed()
 	StartTransmission();
 }
 
-event ReceivedText(string Text)
+private function string ParseHTTPResponse(string response)
 {
-	Parent.LogDebug("Received Text: " $ Text);
-	CachedResponseText $= Text;
+	local array<string> ResponseLines, StatusLine;
+	local int i;
+	local string MessageBody;
+	local bool bHeadersFinished;
+	bHeadersFinished = false;
+	MessageBody = "";
+	ResponseLines = SplitString(response, NEWLINE, false);
+	for (i = 0; i < ResponseLines.Length; i++)
+	{
+		if (i == 0)
+		{
+			// Process Status Line!
+			StatusLine = SplitString(ResponseLines[i], " ", false);
+			if (int(StatusLine[1]) != 200)
+			{
+				// It's not 200 OK, so we set our response object accordingly
+				MessageBody = "{\"success\":\"" $ StatusLine[1] $ " " $ StatusLine[2] $ "\"}";
+				break;
+			}
+		}
+		else if (bHeadersFinished)
+		{
+			MessageBody $= ResponseLines[i];
+		}
+		else if (ResponseLines[i] == "")
+		{
+			// Headers done
+			bHeadersFinished = true;
+		}
+	}
+	Parent.LogDebug("Parsed HTTP message body: " $ MessageBody);
+	return MessageBody;
 }
 
 DefaultProperties
