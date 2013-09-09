@@ -46,72 +46,81 @@ Encryption.Decrypt = function (ct, key) {
 	return Encryption.PadString(temp, key, Encryption.GetByteForHex(ct.substring(1, 3)));
 };
 
-var Action = function (type, password) {
-	var that = {}, urlstring = [];
-	that.DBTYPE = 'object_type';
-	that.DBNAME = 'object_name';
-	that.handler = type;
+var SagRequest = function (password) {
+	var that = {}, data = [];
 	that.password = password;
-	
-	that.add = function (key, value) {
-		urlstring.push({key: key, value: value});
+
+	that.setDestination = function (dest) {
+		that.dest = dest;
+		return that;
+	}
+
+	that.addURLPair = function (key, value, encrypt) {
+		if (encrypt !== undefined) {
+			value = Encryption.Encrypt(value, that.password);
+		}
+		data.push({key: key, value: value});
 	};
 	
-	that.set = function (key, value) {
+	that.setURLPair = function (key, value, encrypt) {
 		for (var i = 0; i < urlstring.length; i++) {
 			if (urlstring[i].key === key) {
+				if (encrypt !== undefined) {
+					value = Encryption.Encrypt(value, that.password);
+				}
 				urlstring[i].value = value;
 				return;
 			}
 		}
 	};
-	
-	that.Encrypt = function (text, encrypt) {
-		if (encrypt !== undefined) {
-			text = Encryption.Encrypt(text, that.password);
-		}
-		return text;
-	};
-	
-	that.GetURLString = function () {
-		var segments = [], pair;
+
+	that.GetData = function () {
+		var segments = [];
 		for (var i = 0; i < urlstring.length; i++) {
-			pair = urlstring[i];
-			segments[i] = pair.key + "=" + pair.value;
+			segments[i] = urlstring[i].key + "=" + urlstring[i].value;
 		}
 		return segments.join('&');
 	};
-	
+
+	return that;
+}
+
+var Action = function (handler, password) {
+	var that = {};
+	that.DBTYPE = 'object_type';
+	that.DBNAME = 'object_name';
+	that.request = SagRequest(password);
+	that.request.setDestination(handler);
 	return that;
 };
 
 var GetAction = function (password) {
 	var that = Action('/dbget', password);
-	that.add('rlim', 20);
-	that.add('roff', 0);
+	that.request.addURLPair('rlim', 20);
+	that.request.addURLPair('roff', 0);
 	
 	that.AddFilter = function (field, value, encrypt) {
-		that.add('f', that.Encrypt(field + '::' + value, encrypt));
+		that.request.addURLPair('f', field + '::' + value, encrypt);
 		return that;
 	};
 	
 	that.AddProjection = function (field, encrypt) {
-		that.add('p', (encrypt !== undefined ? '~' : '') + field);
+		that.request.addURLPair('p', field + (encrypt !== undefined ? '~' : ''));
 		return that;
 	};
 	
 	that.SetLimit = function (rl) {
-		that.set('rlim', rl);
+		that.request.setURLPair('rlim', rl);
 		return that;
 	};
 	
 	that.SetOffset = function (ro) {
-		that.set('roff', ro);
+		that.request.setURLPair('roff', ro);
 		return that;
 	};
 	
 	that.Unique = function () {
-		that.set('rlim', 1);
+		that.request.setURLPair('rlim', 1);
 		return that;
 	};
 	
@@ -122,24 +131,7 @@ var AddAction = function (password) {
 	var that = Action('/dbadd', password);
 	
 	that.AddAttribute = function (field, value, encrypt) {
-		that.add('a', that.Encrypt(field + '::' + value, encrypt));
-		return that;
-	};
-	
-	return that;
-};
-
-var ModAction = function (password) {
-	var that = GetAction(password);
-	that.handler = '/dbmod';
-	
-	that.AddModification = function (field, value, encrypt) {
-		that.add('m', that.Encrypt(field + '::' + value, encrypt));
-		return that;
-	};
-	
-	that.SetReturnsResults = function () {
-		that.add('rres', 'true');
+		that.request.addURLPair('a', field + '::' + value, encrypt);
 		return that;
 	};
 	
@@ -149,9 +141,22 @@ var ModAction = function (password) {
 var DelAction = function (password) {
 	var that = GetAction(password);
 	that.handler = '/dbdel';
+	that.request.addURLPair('rres', 'false');
 	
 	that.SetReturnsResults = function () {
-		that.add('rres', 'true');
+		that.request.setURLPair('rres', 'true');
+		return that;
+	};
+	
+	return that;
+};
+
+var ModAction = function (password) {
+	var that = DelAction(password);
+	that.handler = '/dbmod';
+	
+	that.AddModification = function (field, value, encrypt) {
+		that.request.addURLPair('m', field + '::' + value, encrypt);
 		return that;
 	};
 	
@@ -186,15 +191,15 @@ Sagittarius.prototype.CreateAction = function (type) {
 };
 
 Sagittarius.prototype.SubmitAction = function (action, callback) {
-	this.post(action.handler, action.GetURLString(), callback);
+	this.TransmitRequest(action.request, callback);
 };
 
-Sagittarius.prototype.post = function (dest, data, callback) {
+Sagittarius.prototype.TransmitRequest = function (sagRequest, callback) {
 	var request = createCORSRequest();
 	if (!request) {
 		return;
 	}
-	request.open('POST', "http://" + this.appid + ".appspot.com" + dest, true);
+	request.open('POST', "http://" + this.appid + ".appspot.com" + sagRequest.dest, true);
 	if (window.XDomainRequest) {
 		request.onload = function () {
 			callback(JSON.parse(request.responseText.replace("<resp>", "").replace("</resp>", "")));
@@ -208,13 +213,17 @@ Sagittarius.prototype.post = function (dest, data, callback) {
 		};
 	}
 	// Use encodeURI() to encode entire data!!!
-	request.send(encodeURI(data));
+	request.send(encodeURI(sagRequest.GetData()));
 };
 
 Sagittarius.prototype.SendMail = function (sendObj) {
-	var data = "recv=" + sendObj.receiver + "&subj=" + sendObj.subject + "&mesg=" + sendObj.message;
+	var mail = SagRequest(this.pass);
+	mail.setDestination('/mail');
+	mail.addURLPair('recv', sendObj.receiver);
+	mail.addURLPair('subj', sendObj.subject);
+	mail.addURLPair('mesg', sendObj.message);
 	if (sendObj.hasOwnProperty('sender')) {
-		data += ('&send=' + sendObj.sender);
+		mail.addURLPair('send', sendObj.sender);
 	}
-	this.post('/mail', data, sendObj.callback);
+	this.TransmitRequest(mail, sendObj.callback);
 };

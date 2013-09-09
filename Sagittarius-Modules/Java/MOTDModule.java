@@ -1,3 +1,5 @@
+package sagittariustest;
+
 import sagittarius.GetAction;
 import sagittarius.Handler;
 import sagittarius.Module;
@@ -26,19 +28,15 @@ public class MOTDModule extends Module {
     public void QueryMOTD() {
         GetAction ga = (GetAction)parent.CreateAction("get");
         ga.AddFilter(GetAction.DBTYPE, "motd");
-        ga.AddFilter(GetAction.DBNAME, "motd");
+        ga.AddFilter(GetAction.DBNAME, "motd", true);
         ga.AddProjection("message", true);
         ga.Unique();
         SubmitAction("motdquery", ga);
     }
 
     @Override
-    public void OnTextReceived(String ActionID, SagResponse resp) {
-        motd = resp.getValue("message");
-    }
-
-    @Override
-    public void OnCallbackReceived(String ActionID) {
+    public void OnResponseReceived(String ActionID, SagResponse resp) {
+        motd = resp.getDBValue("message");
         handler.invoke();
     }
 }

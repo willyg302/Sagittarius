@@ -32,6 +32,10 @@ public class SagResponse {
         return errorMsg;
     }
     
+    public JSONObject getResponseObject() {
+        return response;
+    }
+    
     public String getDBValue(String key) {
         JSONArray DBObjects = (JSONArray) response.get("dbobjects");
         if (DBObjects == null) {
