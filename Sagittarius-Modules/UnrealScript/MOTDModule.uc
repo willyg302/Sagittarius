@@ -31,15 +31,10 @@ function QueryMOTD()
 	SubmitAction("motdquery", ga);
 }
 
-function OnTextReceived(string ActionID, SagResponse resp)
+function OnResponseReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, resp);
+	super.OnResponseReceived(ActionID, resp);
 	motd = resp.GetValue("message");
-}
-
-function OnCallbackReceived(string ActionID)
-{
-	super.OnCallbackReceived(ActionID);
 	OnMOTDReceivedDelegate();
 }
 

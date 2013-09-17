@@ -18,6 +18,11 @@ function Decode(string Text, Sagittarius s)
 	Parent = s;
 }
 
+function JsonObject GetResponseObject()
+{
+	return response;
+}
+
 function string GetValue(string key)
 {
 	local string ret;

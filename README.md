@@ -1,6 +1,6 @@
 ![alt text](https://raw.github.com/willyg302/Sagittarius/master/Media/Sagittarius_Logo_922x260.png "Sagittarius Logo")
 Authors: William Gaul  
-Version: 0.1
+Version: 0.3
 
 ---
 
