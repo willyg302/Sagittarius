@@ -57,88 +57,112 @@
 
 					<h2 id="what-are-recipes">What Are Recipes?</h2>
 					<p>Using the wizard revolves around the idea of <span class="label label-important">RECIPES</span>. A recipe is a collection of buttons (you can think of them as &ldquo;ingredients&rdquo;), each with certain attributes, that does something when submitted to your application. The following buttons are available:</p>
+					
 					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/get.png" width="70"></a>
+						<img class="media-object pull-left" src="img/wizard/filter.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Add Filter <span class="label">GET</span> <span class="label">MODIFY</span> <span class="label">DELETE</span></h4>
+							Filters restrict which objects to return based on equality. For example, an <code>object_type=="motd"</code> filter would only return objects whose type is &ldquo;motd&rdquo;.
+						</div>
+					</div>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/project.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Add Projection <span class="label">GET</span> <span class="label">MODIFY</span> <span class="label">DELETE</span></h4>
+							Projections tell the database to return only the attributes of the object that are specified. If no projections are specified, the entire object is returned (at higher cost).
+						</div>
+					</div>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/attribute.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Add Attribute <span class="label">ADD</span></h4>
+							Specifies the value of an attribute for the object to be added to the database.
+						</div>
+					</div>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/modification.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Modify Attribute <span class="label">MODIFY</span></h4>
+							Specifies the new value of an attribute to be modified. If more than one object is being modified, all objects will take on this new value.
+						</div>
+					</div>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/limit.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Set Limit <span class="label">GET</span> <span class="label">MODIFY</span> <span class="label">DELETE</span></h4>
+							Sets the maximum number of objects to operate on. If more objects exist that satisfy your query, they will be ignored.
+						</div>
+					</div>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/offset.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Set Offset <span class="label">GET</span> <span class="label">MODIFY</span> <span class="label">DELETE</span></h4>
+							Sets the offset in the database to return results. This allows for pagination across multiple queries: query 1 can get objects 0-19, query 2 can get objects 20-39, and so on.
+						</div>
+					</div>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/returns.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Returns Results <span class="label">MODIFY</span> <span class="label">DELETE</span></h4>
+							By default, the MODIFY and DELETE actions do not return objects. This button tells the actions to return results, optionally with projections and limits as in a GET action.
+						</div>
+					</div>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/generic.png" width="70">
+						<div class="media-body">
+							<h4 class="media-heading">Generic Parameter <span class="label">LEADERBOARDS</span> <span class="label">SEND MAIL</span></h4>
+							Represents a generic URL parameter, and is used for more low-level interactions with the Sagittarius API. For example, a generic parameter with field &ldquo;f&rdquo; and value &ldquo;v&rdquo; will be encoded as <code>&amp;f=v</code>.
+						</div>
+					</div>
+					<br>
+					<p>In addition, there is a special <strong>action button</strong> automatically added to each recipe. To select the action you want your recipe to carry out, simply left-click the action button (it should be the first button in the <strong>Recipe</strong> row) and select the action from the drop-down list. The following actions are available:</p>
+					<div class="media">
+						<img class="media-object pull-left" src="img/wizard/dbget.png" width="70">
 						<div class="media-body">
 							<h4 class="media-heading">Get Action</h4>
 							Get objects or parts of objects from the database. Which objects are returned, and how many to return, are based on the filters and limits you apply to this action.
 						</div>
 					</div>
 					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/add.png" width="70"></a>
+						<img class="media-object pull-left" src="img/wizard/dbadd.png" width="70">
 						<div class="media-body">
 							<h4 class="media-heading">Add Action</h4>
 							Add an object with the specified attributes to the database.
 						</div>
 					</div>
 					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/mod.png" width="70"></a>
+						<img class="media-object pull-left" src="img/wizard/dbmod.png" width="70">
 						<div class="media-body">
 							<h4 class="media-heading">Modify Action</h4>
 							Modify certain attributes of objects from the database, optionally returning the modified objects. The objects to modify are determined by applied filters and limits.
 						</div>
 					</div>
 					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/del.png" width="70"></a>
+						<img class="media-object pull-left" src="img/wizard/dbdel.png" width="70">
 						<div class="media-body">
 							<h4 class="media-heading">Delete Action</h4>
 							Delete all objects that satisfy the applied filters and limits from the database, optionally returning them.
 						</div>
 					</div>
 					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/filter.png" width="70"></a>
+						<img class="media-object pull-left" src="img/wizard/ldbds.png" width="70">
 						<div class="media-body">
-							<h4 class="media-heading">Add Filter</h4>
-							Filters restrict which objects to return based on equality. For example, an <code>object_type=="motd"</code> filter would only return objects whose type is &ldquo;motd&rdquo;. <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
+							<h4 class="media-heading">Leaderboards Action</h4>
+							Interact with the leaderboards system built into Sagittarius. Offers full support for adding/purging/removing leaderboards, posting to an existing leaderboard, and getting leaderboard data.
 						</div>
 					</div>
 					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/project.png" width="70"></a>
+						<img class="media-object pull-left" src="img/wizard/mail.png" width="70">
 						<div class="media-body">
-							<h4 class="media-heading">Add Projection</h4>
-							Projections tell the database to return only the attributes of the object that are specified. If no projections are specified, the entire object is returned (at higher cost). <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
-						</div>
-					</div>
-					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/attribute.png" width="70"></a>
-						<div class="media-body">
-							<h4 class="media-heading">Add Attribute</h4>
-							Specifies the value of an attribute for the object to be added to the database. <strong>[ADD]</strong>
-						</div>
-					</div>
-					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/modification.png" width="70"></a>
-						<div class="media-body">
-							<h4 class="media-heading">Modify Attribute</h4>
-							Specifies the new value of an attribute to be modified. If more than one object is being modified, all objects will take on this new value. <strong>[MODIFY]</strong>
-						</div>
-					</div>
-					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/limit.png" width="70"></a>
-						<div class="media-body">
-							<h4 class="media-heading">Set Limit</h4>
-							Sets the maximum number of objects to operate on. If more objects exist that satisfy your query, they will be ignored. <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
-						</div>
-					</div>
-					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/offset.png" width="70"></a>
-						<div class="media-body">
-							<h4 class="media-heading">Set Offset</h4>
-							Sets the offset in the database to return results. This allows for pagination across multiple queries: query 1 can get objects 0-19, query 2 can get objects 20-39, and so on. <strong>[GET &middot; MODIFY &middot; DELETE]</strong>
-						</div>
-					</div>
-					<div class="media">
-						<a class="pull-left" href="javascript:void(0)"><img class="media-object" src="img/wizard/returns.png" width="70"></a>
-						<div class="media-body">
-							<h4 class="media-heading">Returns Results</h4>
-							By default, the MODIFY and DELETE actions do not return objects. This button tells the actions to return results, optionally with projections and limits as in a GET action. <strong>[MODIFY &middot; DELETE]</strong>
+							<h4 class="media-heading">Send Mail Action</h4>
+							Send an email to the provided address through Sagittarius.
 						</div>
 					</div>
 
 					<h2 id="an-example-recipe">An Example Recipe</h2>
 					<p>Consider the recipe below:</p>
 					<div>
-						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/get.png" width="70"></div>
+						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/dbget.png" width="70"></div>
 						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/filter.png" width="70"></div>
 						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/filter.png" width="70"></div>
 						<div style="float:left; margin-right:10px; margin-bottom:10px;"><img class="media-object" src="img/wizard/project.png" width="70"></div>
@@ -149,8 +173,8 @@
 					
 					
 					<h2 id="adding-and-deleting-buttons">Adding and Deleting Buttons</h2>
-					<p>Add a button to your recipe by clicking on it in the <strong>Available Buttons</strong> row. Not all buttons in the row will be clickable; for example, once you have selected an action you cannot add another one, so all the action buttons will be grayed-out. Once you have added a button, you can click on it in the <strong>Recipe</strong> row to modify its attributes. Doing so will bring up a dialogue of available options for that button type.</p>
-					<p>If you want to delete a button from your recipe, just right-click it. However, you cannot delete an action button if you have added other buttons to your recipe. For a quick way to clear an entire recipe, go to <strong>File &rarr; Clear Recipe</strong> or press <strong>Ctrl+N</strong>.</p>
+					<p>Add a button to your recipe by clicking on it in the <strong>Available Buttons</strong> row. Not all buttons in the row will be clickable; whether or not you can add a button depends on the action you have selected. Once you have added a button, you can click on it in the <strong>Recipe</strong> row to modify its attributes. Doing so will bring up a dialogue of available options for that button type.</p>
+					<p>If you want to delete a button from your recipe, just right-click it. For a quick way to clear an entire recipe, go to <strong>File &rarr; Clear Recipe</strong> or press <strong>Ctrl+N</strong>. Note that you can never delete the action button.</p>
 
 					<h2 id="managing-recipes">Managing Recipes</h2>
 					<p>The best part about recipes is that you can save and load them at any time. To save a new recipe, go to <strong>File &rarr; Save Recipe As...</strong> or press <strong>Alt+S</strong> and enter the name you would like to give the recipe. You can also use the quicker <strong>File &rarr; Save Recipe</strong> or <strong>Ctrl+S</strong> (if the recipe has not already been saved, you will be prompted to name it).</p>
