@@ -63,12 +63,12 @@ var SagRequest = function (password) {
 	};
 	
 	that.setURLPair = function (key, value, encrypt) {
-		for (var i = 0; i < urlstring.length; i++) {
-			if (urlstring[i].key === key) {
+		for (var i = 0; i < data.length; i++) {
+			if (data[i].key === key) {
 				if (encrypt !== undefined) {
 					value = Encryption.Encrypt(value, that.password);
 				}
-				urlstring[i].value = value;
+				data[i].value = value;
 				return;
 			}
 		}
@@ -76,8 +76,8 @@ var SagRequest = function (password) {
 
 	that.GetData = function () {
 		var segments = [];
-		for (var i = 0; i < urlstring.length; i++) {
-			segments[i] = urlstring[i].key + "=" + urlstring[i].value;
+		for (var i = 0; i < data.length; i++) {
+			segments[i] = data[i].key + "=" + data[i].value;
 		}
 		return segments.join('&');
 	};
