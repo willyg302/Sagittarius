@@ -73,7 +73,7 @@ object_name="motd"
 message="Welcome to my game, have fun playing!"
 </pre>
 					<p>The first two attributes are required, so we'll simply set them as <code>"motd"</code> to make filtering for the MOTD easier.</p>
-					<p>Now we need to upload our message. You can use the <a href="wizard.html">Sagittarius Wizard</a> to do this. If this is your first time uploading a MOTD, add an <strong>Add Action</strong> button followed by three <strong>Add Attribute</strong> buttons to set the attributes to the values listed above. If you already have a MOTD, you can add a <strong>Modify Action</strong> instead to modify the message attribute.</p>
+					<p>Now we need to upload our message. You can use the <a href="wizard.html">Sagittarius Wizard</a> to do this. If this is your first time uploading a MOTD, set the action button to <strong>Add</strong> and add three <strong>Add Attribute</strong> buttons to set the attributes to the values listed above. If you already have a MOTD, you can set the action button to <strong>Modify</strong> instead to modify the message attribute.</p>
 
 					<h2 id="defining-our-class">Defining Our Class</h2>
 					<p>The first thing we'll do code-wise is create a new class extending from <code>Module.java</code> and copy over all the necessary functions:</p>
@@ -90,21 +90,16 @@ public class MOTDModule extends Module {
 	}
 
 	@Override
-	public void OnTextReceived(String ActionID, SagResponse resp) {
-		// When any text is received from remote service
-	}
-
-	@Override
-	public void OnCallbackReceived(String ActionID) {
-		// When remote transmission is fully completed
+	public void OnResponseReceived(String ActionID, SagResponse resp) {
+		// When a response is received from the remote service
 	}
 }
 </pre>
-					<p>Save this file as <code>MOTDModule.java</code> in your project's source directory. Every module you create should have at least this basic skeleton. Although you do not need to have anything in the <code>OnTextReceived()</code> or <code>OnCallbackReceived()</code> functions, you must override the constructor to specify a module ID. This ID will be used by Sagittarius to identify and retrieve instances of this module, and should be unique (otherwise, modules could be confused for each other).</p>
+					<p>Save this file as <code>MOTDModule.java</code> in your project's source directory. Every module you create should have at least this basic skeleton. Although you do not need to have anything in the <code>OnResponseReceived()</code> function, you must override the constructor to specify a module ID. This ID will be used by Sagittarius to identify and retrieve instances of this module, and should be unique (otherwise, modules could be confused for each other).</p>
 
 					<h2 id="the-handler-pattern">The Handler Pattern</h2>
 					<p>Anything that relies on an Internet connection is <strong>asynchronous</strong>. That is, we cannot predict how long it will take for us to send data to our App Engine application, or when the server will reply. Because of this, we cannot simply wait for a response; we want to be <strong>notified</strong> when a response is received.</p>
-					<p>Sagittarius masks most of the complexity of such event handling for you, piping all notifications through the <code>OnTextReceived()</code> and <code>OnCallbackReceived()</code> functions we've already declared. However, your project will be interacting with your modules directly, so we need another layer of event handlers within each module you make. Thankfully there is a very simple <i>handler pattern</i> to follow:</p>
+					<p>Sagittarius masks most of the complexity of such event handling for you, piping all notifications through the <code>OnResponseReceived()</code> function we've already declared. However, your project will be interacting with your modules directly, so we need another layer of event handlers within each module you make. Thankfully there is a very simple <i>handler pattern</i> to follow:</p>
 <pre class="prettyprint linenums pre-scrollable">
 import sagittarius.Handler;
 import sagittarius.Module;
@@ -125,17 +120,12 @@ public class MOTDModule extends Module {
 	}
 
 	@Override
-	public void OnTextReceived(String ActionID, SagResponse resp) {
-		// When any text is received from remote service
-	}
-
-	@Override
-	public void OnCallbackReceived(String ActionID) {
+	public void OnResponseReceived(String ActionID, SagResponse resp) {
 		handler.invoke();
 	}
 }
 </pre>
-					<p>A class that wants to know when the Message of the Day has been received simply registers a handler through <code>RegisterOnMOTDReceivedHandler()</code>. When everything is done, <code>OnCallbackReceived()</code> is called, and in turn the custom handler. <code>Handler.java</code> is a very simple abstract class that defines one method, <code>invoke()</code>, that can be overridden in an <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/innerclasses.html">anonymous inner class</a> to do what you want.</p>
+					<p>A class that wants to know when the Message of the Day has been received simply registers a handler through <code>RegisterOnMOTDReceivedHandler()</code>. When everything is done, <code>OnResponseReceived()</code> is called, and in turn the custom handler. <code>Handler.java</code> is a very simple abstract class that defines one method, <code>invoke()</code>, that can be overridden in an <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/innerclasses.html">anonymous inner class</a> to do what you want.</p>
 					<p>We'll see this pattern in action a little later on, but for now you should remember how to set it up:</p>
 					<ul>
 						<li>Declare a handler</li>
@@ -177,12 +167,7 @@ public class MOTDModule extends Module {
 	}
 
 	@Override
-	public void OnTextReceived(String ActionID, SagResponse resp) {
-		// When any text is received from remote service
-	}
-
-	@Override
-	public void OnCallbackReceived(String ActionID) {
+	public void OnResponseReceived(String ActionID, SagResponse resp) {
 		handler.invoke();
 	}
 }
@@ -221,24 +206,20 @@ public class MOTDModule extends Module {
 		GetAction ga = (GetAction)parent.CreateAction("get");
 		ga.AddFilter(GetAction.DBTYPE, "motd");
 		ga.AddFilter(GetAction.DBNAME, "motd");
-		ga.AddProjection("message");
+		ga.AddProjection("message", true);
 		ga.Unique();
 		SubmitAction("motdquery", ga);
 	}
 
 	@Override
-	public void OnTextReceived(String ActionID, SagResponse resp) {
-		motd = resp.getValue("message");
-	}
-
-	@Override
-	public void OnCallbackReceived(String ActionID) {
+	public void OnResponseReceived(String ActionID, SagResponse resp) {
+		motd = resp.getDBValue("message");
 		handler.invoke();
 	}
 }
 </pre>
 					<p>Our added code shows how to make use of the actions bundled with the starter kit. First, we create a new instance of GetAction. Then we add our filters and projections to it. We only want to get the DBObject with <code>object_type=="motd"</code> and <code>object_name=="motd"</code>, so we add those filters using the special shortcut variables <code>DBTYPE</code> and <code>DBNAME</code> respectively. We only want to return the actual <i>message</i>, so we add a projection for that field. Since we expect there to be only one MOTD, we make the query unique. And finally, we submit the GetAction and assign it an ID of <code>"motdquery"</code> so that it can be identified later.</p>
-					<p>Any time that Sagittarius receives a reply from the server, the text will be routed to <code>OnTextReceived()</code>. Therefore it is here that we want to parse the MOTD message and assign it to our local cache. Replies are encoded as a special SagResponse object, which provides a convenient <code>getValue()</code> function to return the first value matching the specified key. Once we do that, our module is complete.</p>
+					<p>Any time that Sagittarius receives a reply from the server, the text will be routed to <code>OnResponseReceived()</code>. Therefore it is here that we want to parse the MOTD message and assign it to our local cache. Replies are encoded as a special SagResponse object, which provides a convenient <code>getDBValue()</code> function to return the first value matching the specified key. Once we do that, our module is complete.</p>
 
 					<h2 id="using-our-motd-module">Using Our MOTD Module</h2>
 					<p>Since this is a simple tutorial, we'll just create a class that prints the MOTD to the screen as soon as it is received. To demonstrate the asynchronous capabilities of Sagittarius, we will also print a bunch of &ldquo;o&rdquo; characters to the screen, one every 40 milliseconds:</p>

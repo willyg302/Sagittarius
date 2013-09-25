@@ -78,23 +78,17 @@ object_name="motd"
 message="Welcome to my game, have fun playing!"
 </pre>
 					<p>The first two attributes are required, so we'll simply set them as <code>"motd"</code> to make filtering for the MOTD easier.</p>
-					<p>Now we need to upload our message. You can use the <a href="wizard.html">Sagittarius Wizard</a> to do this. If this is your first time uploading a MOTD, add an <strong>Add Action</strong> button followed by three <strong>Add Attribute</strong> buttons to set the attributes to the values listed above. If you already have a MOTD, you can add a <strong>Modify Action</strong> instead to modify the message attribute.</p>
+					<p>Now we need to upload our message. You can use the <a href="wizard.html">Sagittarius Wizard</a> to do this. If this is your first time uploading a MOTD, set the action button to <strong>Add</strong> and add three <strong>Add Attribute</strong> buttons to set the attributes to the values listed above. If you already have a MOTD, you can set the action button to <strong>Modify</strong> instead to modify the message attribute.</p>
 
 					<h2 id="defining-our-class">Defining Our Class</h2>
 					<p>The first thing we'll do code-wise is create a new class extending from <code>Module.uc</code> and copy over all the necessary functions:</p>
 <pre class="prettyprint linenums pre-scrollable">
 class MOTDModule extends Module;
 
-function OnTextReceived(string ActionID, SagResponse resp)
+function OnResponseReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, resp);
-	// When any text is received from remote service
-}
-
-function OnCallbackReceived(string ActionID)
-{
-	super.OnCallbackReceived(ActionID);
-	// When remote transmission is fully completed
+	super.OnResponseReceived(ActionID, resp);
+	// When a response is received from the remote service
 }
 
 DefaultProperties
@@ -102,11 +96,11 @@ DefaultProperties
 	ID="motd"
 }
 </pre>
-					<p>Save this file as <code>MOTDModule.uc</code> in your project's source directory. Every module you create should have at least this basic skeleton. Although you do not need to override the <code>OnTextReceived()</code> or <code>OnCallbackReceived()</code> functions, you must specify a module ID in the DefaultProperties block. This ID will be used by Sagittarius to identify and retrieve instances of this module, and should be unique (otherwise, modules could be confused for each other).</p>
+					<p>Save this file as <code>MOTDModule.uc</code> in your project's source directory. Every module you create should have at least this basic skeleton. Although you do not need to override the <code>OnResponseReceived()</code> function, you must specify a module ID in the DefaultProperties block. This ID will be used by Sagittarius to identify and retrieve instances of this module, and should be unique (otherwise, modules could be confused for each other).</p>
 
 					<h2 id="the-delegate-pattern">The Delegate Pattern</h2>
 					<p>Anything that relies on an Internet connection is <strong>asynchronous</strong>. That is, we cannot predict how long it will take for us to send data to our App Engine application, or when the server will reply. Because of this, we cannot simply wait for a response; we want to be <strong>notified</strong> when a response is received. This is a job for <a href="http://udn.epicgames.com/Three/UnrealScriptDelegates.html">UnrealScript delegates</a>.</p>
-					<p>Sagittarius masks most of the complexity of delegates and event handling for you, piping all notifications through the <code>OnTextReceived()</code> and <code>OnCallbackReceived()</code> functions we've already declared. However, your game will be interacting with your modules directly, so we need another layer of delegates within each module you make. Thankfully there is a very simple <i>delegate pattern</i> to follow:</p>
+					<p>Sagittarius masks most of the complexity of delegates and event handling for you, piping all notifications through the <code>OnResponseReceived()</code> function we've already declared. However, your game will be interacting with your modules directly, so we need another layer of delegates within each module you make. Thankfully there is a very simple <i>delegate pattern</i> to follow:</p>
 <pre class="prettyprint linenums pre-scrollable">
 class MOTDModule extends Module;
 
@@ -117,15 +111,9 @@ function RegisterOnMOTDReceivedDelegate(delegate&lt;OnMOTDReceivedDelegate&gt; d
 	OnMOTDReceivedDelegate = del;
 }
 
-function OnTextReceived(string ActionID, SagResponse resp)
+function OnResponseReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, resp);
-	// When any text is received from remote service
-}
-
-function OnCallbackReceived(string ActionID)
-{
-	super.OnCallbackReceived(ActionID);
+	super.OnResponseReceived(ActionID, resp);
 	OnMOTDReceivedDelegate();
 }
 
@@ -134,7 +122,7 @@ DefaultProperties
 	ID="motd"
 }
 </pre>
-					<p>A class (such as your GameInfo class) that wants to know when the Message of the Day has been received simply registers a function to call through <code>RegisterOnMOTDReceivedDelegate()</code>. When everything is done, <code>OnCallbackReceived()</code> is called, and in turn <code>OnMOTDReceivedDelegate()</code>, which then in turn calls the function you registered.</p>
+					<p>A class (such as your GameInfo class) that wants to know when the Message of the Day has been received simply registers a function to call through <code>RegisterOnMOTDReceivedDelegate()</code>. When everything is done, <code>OnResponseReceived()</code> is called, and in turn <code>OnMOTDReceivedDelegate()</code>, which then in turn calls the function you registered.</p>
 					<p>We'll see this pattern in action a little later on, but for now you should remember how to set it up:</p>
 					<ul>
 						<li>Declare a delegate</li>
@@ -174,15 +162,9 @@ function QueryMOTD()
 	// @TODO
 }
 
-function OnTextReceived(string ActionID, SagResponse resp)
+function OnResponseReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, resp);
-	// When any text is received from remote service
-}
-
-function OnCallbackReceived(string ActionID)
-{
-	super.OnCallbackReceived(ActionID);
+	super.OnResponseReceived(ActionID, resp);
 	OnMOTDReceivedDelegate();
 }
 
@@ -224,20 +206,15 @@ function QueryMOTD()
 	ga = GetAction(Parent.CreateAction("get"));
 	ga.AddFilter(ga.DBTYPE, "motd");
 	ga.AddFilter(ga.DBNAME, "motd");
-	ga.AddProjection("message");
+	ga.AddProjection("message", true);
 	ga.Unique();
 	SubmitAction("motdquery", ga);
 }
 
-function OnTextReceived(string ActionID, SagResponse resp)
+function OnResponseReceived(string ActionID, SagResponse resp)
 {
-	super.OnTextReceived(ActionID, resp);
+	super.OnResponseReceived(ActionID, resp);
 	motd = resp.GetValue("message");
-}
-
-function OnCallbackReceived(string ActionID)
-{
-	super.OnCallbackReceived(ActionID);
 	OnMOTDReceivedDelegate();
 }
 
@@ -247,7 +224,7 @@ DefaultProperties
 }
 </pre>
 					<p>Our added code shows how to make use of the actions bundled with the starter kit. First, we create a new instance of GetAction. Then we add our filters and projections to it. We only want to get the DBObject with <code>object_type=="motd"</code> and <code>object_name=="motd"</code>, so we add those filters using the special shortcut variables <code>DBTYPE</code> and <code>DBNAME</code> respectively. We only want to return the actual <i>message</i>, so we add a projection for that field. Since we expect there to be only one MOTD, we make the query unique. And finally, we submit the GetAction and assign it an ID of <code>"motdquery"</code> so that it can be identified later.</p>
-					<p>Any time that Sagittarius receives a reply from the server, the text will be routed to <code>OnTextReceived()</code>. Therefore it is here that we want to parse the MOTD message and assign it to our local cache. Replies are encoded as a special SagResponse object, which provides a convenient <code>GetValue()</code> function to return the first value matching the specified key. Once we do that, our module is complete.</p>
+					<p>Any time that Sagittarius receives a reply from the server, the text will be routed to <code>OnResponseReceived()</code>. Therefore it is here that we want to parse the MOTD message and assign it to our local cache. Replies are encoded as a special SagResponse object, which provides a convenient <code>GetValue()</code> function to return the first value matching the specified key. Once we do that, our module is complete.</p>
 
 					<h2 id="using-our-motd-module">Using Our MOTD Module</h2>
 					<p>Since this is a simple tutorial, we'll just modify <code>SagittariusGame.uc</code> to fetch the MOTD one second after a level has been loaded and broadcast it to all players. In a more realistic scenario you'd probably fetch the MOTD upon startup and integrate the message into a menu or HUD element. Our modifications are as follows:</p>
@@ -304,9 +281,6 @@ function PrintMOTD()
 function SendMail(string Receiver, string Subject, string Message, optional string Sender = "")
 </pre>
 					<p>The Sender parameter is a string referencing the subdomain of your application that you want the email to be sent from. For example, if your <code>Application Identifier</code> is &ldquo;myapplication&rdquo; and your Sender parameter is set to &ldquo;donuts&rdquo;, then the recipient will receive an email from <strong>donuts@myapplication.appspotmail.com</strong>. Note that you do not have to specify a Sender; if you don't, it will default to &ldquo;admin&rdquo;.</p>
-
-					<h2 id="getting-the-local-ip">Getting the Local IP</h2>
-					<p>You can get the local IP address (that is, the IP of the player's computer) at any time by using the <code>GetLocalIP()</code> function in <code>Sagittarius.ic</code>. The IP is returned as a string.</p>
 				</section>
 
 				<section id="logging">
