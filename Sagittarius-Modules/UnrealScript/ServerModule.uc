@@ -90,7 +90,7 @@ function ParseServerList(array<JsonObject> JsonServers)
 	for (i = 0; i < JsonServers.Length; i++)
 	{
 		temp.ServerName = JsonServers[i].GetStringValue("object_name");
-		temp.IP = JsonServers[i].GetStringValue("ip");
+		temp.IP = Parent.Decrypt(JsonServers[i].GetStringValue("ip"));
 		temp.MapName = JsonServers[i].GetStringValue("map");
 		Servers.AddItem(temp);
 	}
