@@ -15,13 +15,11 @@ public class SagResponse {
     private JSONObject response;
     private boolean wasSuccessful;
     private String errorMsg;
-    private Sagittarius parent;
     
-    public SagResponse(String text, Sagittarius s) {
+    public SagResponse(String text) {
         this.response = (JSONObject) JSONValue.parse(text);
         this.wasSuccessful = response.get("success").equals("y");
         this.errorMsg = (String) response.get("success");
-        this.parent = s;
     }
     
     public boolean wasSuccessful() {
@@ -46,7 +44,7 @@ public class SagResponse {
         }
         String ret = (String) ((JSONObject) DBObjects.get(0)).get(key);
         if (ret.startsWith("~")) {
-            ret = parent.decrypt(ret);
+            ret = Sagittarius.getInstance().decrypt(ret);
         }
         return ret;
     }
@@ -60,7 +58,7 @@ public class SagResponse {
         for (int i = 0; i < DBObjects.size(); i++) {
             String temp = (String) ((JSONObject) DBObjects.get(i)).get(key);
             if (temp.startsWith("~")) {
-                temp = parent.decrypt(temp);
+                temp = Sagittarius.getInstance().decrypt(temp);
             }
             ret.add(temp);
         }

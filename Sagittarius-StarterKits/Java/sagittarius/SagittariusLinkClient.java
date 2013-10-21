@@ -13,7 +13,6 @@ import java.io.IOException;
 
 public class SagittariusLinkClient {
 
-    private Sagittarius parent;
     private String TargetHost;
     private boolean isBusy;
     private AsyncHttpClient ahc;
@@ -21,8 +20,7 @@ public class SagittariusLinkClient {
     private ArrayList<SagRequest> requestQueue;
     private SagRequest currentRequest;
 
-    public SagittariusLinkClient(Sagittarius s, String THost) {
-        this.parent = s;
+    public SagittariusLinkClient(String THost) {
         this.TargetHost = "http://" + THost + ".appspot.com";
         this.requestQueue = new ArrayList<SagRequest>();
         this.ahc = new AsyncHttpClient();
@@ -47,7 +45,7 @@ public class SagittariusLinkClient {
         }
         isBusy = true;
         currentRequest = requestQueue.remove(0);
-        parent.LogDebug("Resolving: " + TargetHost);
+        Sagittarius.LogDebug("Resolving: " + TargetHost);
         try {
             asyncPost();
             Sagittarius.LogInfo("TCP connection opened for module " + currentRequest.getModuleID() + " and query " + currentRequest.getQueryID());
@@ -108,7 +106,7 @@ public class SagittariusLinkClient {
                 
                 // In any case, our connection is done
                 Sagittarius.LogInfo("TCP connection closed for module " + currentRequest.getModuleID() + " and query " + currentRequest.getQueryID());
-                parent.OnResponseReceived(currentRequest.getModuleID(), currentRequest.getQueryID(), new SagResponse(ret, parent));
+                Sagittarius.getInstance().OnResponseReceived(currentRequest.getModuleID(), currentRequest.getQueryID(), new SagResponse(ret));
                 isBusy = false;
 
                 // Retry transmission in case there are any queued messages (if not, nothing happens)

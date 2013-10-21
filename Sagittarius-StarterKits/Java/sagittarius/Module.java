@@ -8,11 +8,6 @@ package sagittarius;
 public abstract class Module {
 
     protected String ID;
-    protected Sagittarius parent;
-
-    public Module(Sagittarius s) {
-        this.parent = s;
-    }
 
     public String getID() {
         return ID;

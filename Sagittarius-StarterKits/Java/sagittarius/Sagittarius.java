@@ -21,28 +21,30 @@ public class Sagittarius {
         LOG_None, LOG_Error, LOG_Warn, LOG_Info, LOG_Debug;
     }
     private static ELogLevel logLevel = ELogLevel.LOG_Debug;
-
-    public Sagittarius(String AppID, String Pass) {
-        this.link = new SagittariusLinkClient(this, AppID);
-        this.SagPass = Pass;
+    
+    private Sagittarius() {
+        // Private for singleton model
+        this.link = null;
+        this.SagPass = "";
         this.modules = new HashMap<String, Module>();
     }
+
+    /**
+     * Private inner class as per the Initialization-on-demand Holder Idiom.
+     * See: http://en.wikipedia.org/wiki/Initialization_on_demand_holder_idiom
+     * This method is both lazy and thread-safe.
+     */
+    private static class SagittariusHolder {
+        public static final Sagittarius INSTANCE = new Sagittarius();
+    }
     
-    public Action CreateAction(String type) {
-        Action a = null;
-        if (type.equals("get")) {
-            a = new GetAction();
-        } else if (type.equals("add")) {
-            a = new AddAction();
-        } else if (type.equals("mod")) {
-            a = new ModAction();
-        } else if (type.equals("del")) {
-            a = new DelAction();
-        } else {
-            return a;
-        }
-        a.initializeRequest(new SagRequest(this));
-        return a;
+    public static Sagittarius getInstance() {
+        return SagittariusHolder.INSTANCE;
+    }
+    
+    public void Initialize(String AppID, String Pass) {
+        this.link = new SagittariusLinkClient(AppID);
+        this.SagPass = Pass;
     }
 
     public void RegisterModule(Module m) {
@@ -58,6 +60,10 @@ public class Sagittarius {
     }
     
     public void SubmitRequest(SagRequest sr) {
+        if (link == null) {
+            LogError("SubmitRequest() - did you forget to initialize Sagittarius?");
+            return;
+        }
         link.TransmitRequest(sr);
     }
 
@@ -83,7 +89,7 @@ public class Sagittarius {
      * MAIL
      */
     public void SendMail(String receiver, String subject, String message, String sender) {
-        SagRequest mail = new SagRequest(this).setDestination("/mail").setModuleInfo("builtin", "mail");
+        SagRequest mail = new SagRequest().setDestination("/mail").setModuleInfo("builtin", "mail");
         mail.addURLPair("recv", receiver, false);
         mail.addURLPair("subj", subject, false);
         mail.addURLPair("mesg", message, false);

@@ -8,22 +8,20 @@ package sagittarius;
 public class SagRequest {
 
     private String dest, data, mID, qID;
-    private Sagittarius parent;
     private String delim;
 
-    public SagRequest(Sagittarius s) {
-        this.parent = s;
+    public SagRequest() {
         this.data = "";
         this.delim = "";
     }
     
     public void submit() {
-        parent.SubmitRequest(this);
+        Sagittarius.getInstance().SubmitRequest(this);
     }
     
     public void addURLPair(String param, String value, boolean encryptValue) {
         if (encryptValue) {
-            value = parent.encrypt(value);
+            value = Sagittarius.getInstance().encrypt(value);
         }
         this.data += (delim + param + "=" + value);
         this.delim = "&";
