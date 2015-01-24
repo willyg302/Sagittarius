@@ -1,0 +1,90 @@
+img {
+	max-width: 100%;
+}
+
+body {
+	padding-top: 50px;
+}
+
+.doc-header {
+	padding: 60px 0;
+	font-size: 24px;
+	text-align: left;
+	background-color: #e7e7e7;
+
+	h1 {
+		margin-top: 0;
+		font-size: 60px;
+		font-weight: bold;
+		line-height: 1;
+		color: #6699cc;
+	}
+
+	p {
+		color: #ff9100;
+	}
+}
+
+header.navbar {
+	margin-bottom: 0;
+}
+
+.footer {
+	padding: 40px 0;
+	margin-top: 40px;
+	color: #767676;
+	text-align: center;
+	border-top: 1px solid #e5e5e5;
+}
+
+.social-buttons {
+	padding-left: 0;
+	margin-bottom: 0;
+	list-style: none;
+
+	li {
+		display: inline-block;
+		padding: 5px 8px;
+
+		iframe {
+			overflow: hidden;
+			border: 0;
+		}
+	}
+}
+
+.navbar-brand {
+	color: #6699cc !important;
+
+	&:hover {
+		color: #ff9100 !important;
+	}
+}
+
+
+// SIDENAV
+
+.affix, .affix-top {
+	position: static;
+}
+
+@media (min-width: 979px) {
+	#sidenav {
+		&.affix {
+			position: fixed;
+			top: 70px;
+			width: 228px;
+		}
+
+		&.affix-top {
+			position: static;
+			margin-top: 30px;
+			width: 228px;
+		}
+	}
+}
+
+#sidenav li.active {
+	border: 0 solid #eeeeee;
+	border-right-width: 5px;
+}

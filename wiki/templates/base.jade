@@ -12,18 +12,33 @@ html
 			link(rel='icon', type='image/x-icon', href=favicon)
 			link(rel='stylesheet', type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css')
 			link(rel='stylesheet', type='text/css', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/tomorrow.min.css')
+			link(rel='stylesheet', type='text/css', href=relative('/css/main.css'))
 	body
-		div.navbar.navbar-inverse.navbar-fixed-top
-			div.container
-				a.brand(href='/Sagittarius')= defaultPageTitle
-
-
-
+		header.navbar.navbar-default.navbar-fixed-top(role='banner')
+			.container
+				.navbar-header
+					button.navbar-toggle(type='button', data-toggle='collapse', data-target='.navbar-collapse')
+						span.sr-only Toggle navigation
+						span.icon-bar
+						span.icon-bar
+						span.icon-bar
+					a.navbar-brand(href=relative('/'))= defaultPageTitle
+				nav.collapse.navbar-collapse(role='navigation')
+					ul.nav.navbar-nav
+						li: a(href=relative('/getting-started')) Getting Started
+						li: a(href='#') Download
+						li: a(href='#') Starter Kits
+						li: a(href='#') Modules
 		block content
 		block footer
 			footer.footer
-				- var year = new Date().getFullYear()
-				| Copyright &copy; #{year} 
-				a(href=owner.uri)= owner.name
+				.container
+					ul.social-buttons
+						li: iframe.github-btn(src='http://ghbtns.com/github-btn.html?user=willyg302&repo=Sagittarius&type=watch&count=true', width='75', height='20', title='Star on GitHub')
+						li: iframe.github-btn(src='http://ghbtns.com/github-btn.html?user=willyg302&repo=Sagittarius&type=fork&count=true', width='75', height='20', title='Fork on GitHub')
+					p
+						- var year = new Date().getFullYear()
+						| Copyright &copy; #{year} 
+						a(href=owner.uri)= owner.name
 			script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js')
 			script(type='text/javascript', src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/js/bootstrap.min.js')

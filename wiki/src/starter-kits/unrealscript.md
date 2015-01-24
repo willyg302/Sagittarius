@@ -4,9 +4,9 @@ subtitle: The tutorial hub for the UnrealScript starter kit
 template: tutorial.jade
 ---
 
-## Basic Integration
+# Basic Integration
 
-### Copying Files
+## Copying Files
 
 The easiest way to integrate the starter kit with your game is to simply copy all the .uc files into your source directory (which will be something similar to `\Development\Src\MyGame\Classes\`). They should compile successfully out of the box.
 
@@ -22,15 +22,15 @@ An alternative is to create a new directory just for Sagittarius, such as `\Deve
 
 Make sure to place Sagittarius before your game's directory, as the Sagittarius sources must be compiled first. This method is recommended to keep Sagittarius code separate from your projects. You should never have to touch any of the starter kit classes, and updating to a newer starter kit version will simply mean overwriting the contents of the `\Sagittarius\Classes\` folder.
 
-### The GameInfo Class
+## The GameInfo Class
 
 A class called `SagittariusGame.uc` is included with the starter kit to show the minimum amount of code needed to get Sagittarius up and running. You should copy this code into your own GameInfo class. Make sure to replace `[APP ID HERE]` and `[APP PASSWORD HERE]` in the DefaultProperties block with your own application ID and password.
 
 At this point Sagittarius will be fully integrated and ready to use, but it can't really do anything just yet. To start leveraging its power you will need to write some *modules*.
 
-## Easy: MOTD Module
+# Easy: MOTD Module
 
-### Understanding Modules
+## Understanding Modules
 
 Sagittarius is structured around the idea of <span class="label label-danger">MODULES</span> that perform <span class="label label-danger">ACTIONS</span>. If you look in the starter kit you will notice two base classes, `Action.uc` and `Module.uc`. The actions that Sagittarius is capable of performing are fixed; that is, you will never have to write a subclass of `Action.uc`. You *will*, however, have to create modules that use the actions available to Sagittarius.
 
@@ -38,7 +38,7 @@ In order to use a module you will have to **register** it to Sagittarius and **r
 
 To better understand how modules work, let's write a simple Message of the Day Module.
 
-### Uploading a MOTD
+## Uploading a MOTD
 
 Before we start coding, we need to define what we want our MOTD to be and actually host one on our App Engine application. Our MOTD will be extremely simple, just a single string that we will call the "message". A full MOTD DBObject might look something like this:
 
@@ -52,7 +52,7 @@ The first two attributes are required, so we'll simply set them as `"motd"` to m
 
 Now we need to upload our message. You can use the [Sagittarius Wizard](../../wizard) to do this. If this is your first time uploading a MOTD, set the action button to **Add** and add three **Add Attribute** buttons to set the attributes to the values listed above. If you already have a MOTD, you can set the action button to **Modify** instead to modify the message attribute.
 
-### Defining Our Class
+## Defining Our Class
 
 The first thing we'll do code-wise is create a new class extending from `Module.uc` and copy over all the necessary functions:
 
@@ -73,7 +73,7 @@ DefaultProperties
 
 Save this file as `MOTDModule.uc` in your project's source directory. Every module you create should have at least this basic skeleton. Although you do not need to override the `OnResponseReceived()` function, you must specify a module ID in the DefaultProperties block. This ID will be used by Sagittarius to identify and retrieve instances of this module, and should be unique (otherwise, modules could be confused for each other).
 
-### The Delegate Pattern
+## The Delegate Pattern
 
 Anything that relies on an Internet connection is **asynchronous**. That is, we cannot predict how long it will take for us to send data to our App Engine application, or when the server will reply. Because of this, we cannot simply wait for a response; we want to be **notified** when a response is received. This is a job for [UnrealScript delegates](http://udn.epicgames.com/Three/UnrealScriptDelegates.html).
 
@@ -84,7 +84,7 @@ class MOTDModule extends Module;
 
 delegate OnMOTDReceivedDelegate();
 
-function RegisterOnMOTDReceivedDelegate(delegate&lt;OnMOTDReceivedDelegate&gt; del)
+function RegisterOnMOTDReceivedDelegate(delegate<OnMOTDReceivedDelegate> del)
 {
 	OnMOTDReceivedDelegate = del;
 }
@@ -109,7 +109,7 @@ We'll see this pattern in action a little later on, but for now you should remem
 - Make a function that registers a function to this delegate
 - Call the delegate when you want to notify that something has been done
 
-### Caching the MOTD
+## Caching the MOTD
 
 Every time you communicate with your App Engine application, you use a tiny bit of its [quota](https://developers.google.com/appengine/docs/quotas). If you go over the quota your application will go down (equivalent to a crash), so it's important to communicate only when absolutely necessary.
 
@@ -124,7 +124,7 @@ var string motd;
 
 delegate OnMOTDReceivedDelegate();
 
-function RegisterOnMOTDReceivedDelegate(delegate&lt;OnMOTDReceivedDelegate&gt; del)
+function RegisterOnMOTDReceivedDelegate(delegate<OnMOTDReceivedDelegate> del)
 {
 	OnMOTDReceivedDelegate = del;
 }
@@ -159,7 +159,7 @@ DefaultProperties
 
 We have added two new functions. You will call `GetMOTD()` whenever you want to know the MOTD, for example from a Scaleform GFx menu class. When you want to update the MOTD with the value on the server, you can call `QueryMOTD()`. This can be done when the game starts up, for example in a `PostBeginPlay()` function.
 
-### Querying the MOTD</h2>
+## Querying the MOTD</h2>
 
 Since we only really want to *get* the latest MOTD from the server, our `QueryMOTD()` function will only need to implement a single action, appropriately called GetAction:
 
@@ -170,7 +170,7 @@ var string motd;
 
 delegate OnMOTDReceivedDelegate();
 
-function RegisterOnMOTDReceivedDelegate(delegate&lt;OnMOTDReceivedDelegate&gt; del)
+function RegisterOnMOTDReceivedDelegate(delegate<OnMOTDReceivedDelegate> del)
 {
 	OnMOTDReceivedDelegate = del;
 }
@@ -214,7 +214,7 @@ Our added code shows how to make use of the actions bundled with the starter kit
 
 Any time that Sagittarius receives a reply from the server, the text will be routed to `OnResponseReceived()`. Therefore it is here that we want to parse the MOTD message and assign it to our local cache. Replies are encoded as a special SagResponse object, which provides a convenient `GetValue()` function to return the first value matching the specified key. Once we do that, our module is complete.
 
-### Using Our MOTD Module
+## Using Our MOTD Module
 
 Since this is a simple tutorial, we'll just modify `SagittariusGame.uc` to fetch the MOTD one second after a level has been loaded and broadcast it to all players. In a more realistic scenario you'd probably fetch the MOTD upon startup and integrate the message into a menu or HUD element. Our modifications are as follows:
 
@@ -257,13 +257,13 @@ Now let's fire up a SagittariusGame. If all goes well, you should see something 
 
 Congratulations, you have just written your first module!
 
-## Medium: Server Browser
+# Medium: Server Browser
 
 Coming soon!
 
-## Special Functions</h1>
+# Special Functions
 
-### Sending Mail
+## Sending Mail
 
 You can send an email any time from within UDK using the `SendMail()` function in `Sagittarius.uc`:
 
@@ -273,7 +273,7 @@ function SendMail(string Receiver, string Subject, string Message, optional stri
 
 The Sender parameter is a string referencing the subdomain of your application that you want the email to be sent from. For example, if your `Application Identifier` is "myapplication" and your Sender parameter is set to "donuts", then the recipient will receive an email from **donuts@myapplication.appspotmail.com**. Note that you do not have to specify a Sender; if you don't, it will default to "admin".
 
-## Logging
+# Logging
 
 Sagittarius has a built-in log system that is slightly more robust than the UDK ``log()` macro. It supports conditional logging via an enum defined in `Sagittarius.uc`:
 

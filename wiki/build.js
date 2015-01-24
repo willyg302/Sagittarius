@@ -1,8 +1,12 @@
 var metalsmith  = require('metalsmith');
+var cleanCSS    = require('metalsmith-clean-css');
 var collections = require('metalsmith-collections');
 var define      = require('metalsmith-define');
+var headings    = require('metalsmith-headings');
+var less        = require('metalsmith-less');
 var markdown    = require('metalsmith-markdown');
 var permalinks  = require('metalsmith-permalinks');
+var relative    = require('metalsmith-relative');
 var templates   = require('metalsmith-templates');
 
 metalsmith(__dirname)
@@ -12,6 +16,12 @@ metalsmith(__dirname)
 			name: 'WillyG Productions',
 			uri: 'http://willyg302.github.io/'
 		}
+	}))
+	.use(less({
+		pattern: 'less/main.less'
+	}))
+	.use(cleanCSS({
+		files: 'css/*.css'
 	}))
 	.use(collections({
 		starterKits: {
@@ -32,7 +42,9 @@ metalsmith(__dirname)
 			}
 		}
 	}))
+	.use(headings('h1'))
 	.use(permalinks())
+	.use(relative())
 	.use(templates({
 		engine: 'jade',
 		directory: 'templates'

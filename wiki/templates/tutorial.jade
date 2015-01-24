@@ -4,5 +4,40 @@ prepend head
 	- var pageTitle = title + " - " + defaultPageTitle
 
 block content
-	div
-		!= contents
+	.doc-header
+		.container
+			h1= title
+			p= subtitle
+	.container
+		.row
+			.col-md-3#leftcol
+				ul.nav.nav-stacked.doc-sidenav#sidenav
+					each heading in headings
+						li: a(href="##{heading.id}")= heading.text
+			.col-md-9
+				!= contents
+
+append footer
+	script(type='text/javascript').
+		$('#sidenav').affix({
+			offset: {
+				top: 235
+			}
+		});
+
+		$(document.body).scrollspy({
+			target: '#leftcol',
+			offset: $('.navbar').outerHeight(true) + 10
+		});
+
+		$('a[href*=#]:not([href=#])').click(function() {
+			if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+				var target = $(this.hash);
+				target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+				if (target.length) {
+					$('html,body').animate({
+						scrollTop: target.offset().top - 50
+					}, 500);
+				}
+			}
+		});
