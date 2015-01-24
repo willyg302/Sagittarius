@@ -1,0 +1,10 @@
+{
+  "name": "sagittarius",
+  "version": "0.4.0",
+  "author": "William Gaul",
+  "private": true,
+  "devDependencies": {
+    "gulp": "~3.8.10",
+    "gulp-gh-pages": "~0.4.0"
+  }
+}

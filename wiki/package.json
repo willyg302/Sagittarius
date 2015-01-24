@@ -1,0 +1,19 @@
+{
+  "name": "sagittarius-wiki",
+  "version": "0.4.0",
+  "author": "William Gaul",
+  "private": true,
+  "dependencies": {
+    "highlight.js": "~8.4.0",
+    "jade": "~1.9.1"
+  },
+  "devDependencies": {
+    "http-server": "~0.7.4",
+    "metalsmith": "~1.0.1",
+    "metalsmith-collections": "~0.6.0",
+    "metalsmith-define": "~1.0.0",
+    "metalsmith-markdown": "~0.2.1",
+    "metalsmith-permalinks": "~0.4.0",
+    "metalsmith-templates": "~0.6.0"
+  }
+}

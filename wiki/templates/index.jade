@@ -1,0 +1,99 @@
+extends ./base.jade
+
+block content
+
+
+
+//
+	function printNav(page) {
+		document.write("<div class=\"navbar navbar-inverse navbar-fixed-top\"><div class=\"navbar-inner\"><div class=\"container\">");
+		document.write("<button type=\"button\" class=\"btn btn-navbar\" data-toggle=\"collapse\" data-target=\".nav-collapse\"><span class=\"icon-bar\"></span><span class=\"icon-bar\"></span><span class=\"icon-bar\"></span></button>");
+		document.write("<a class=\"brand\" href=\"index.html\">Sagittarius Wiki</a><div class=\"nav-collapse collapse\"><ul class=\"nav\">");
+		document.write("<li class=\"" + ((page == "Home") ? "active" : "") + "\"><a href=\"index.html\">Home</a></li>");
+		document.write("<li class=\"" + ((page == "Downloads") ? "active" : "") + "\"><a href=\"downloads.html\">Downloads</a></li>");
+		document.write("<li class=\"" + ((page == "Starter Kits") ? "active" : "") + "\"><a href=\"starter-kits.html\">Starter Kits</a></li>");
+		document.write("<li class=\"" + ((page == "Modules") ? "active" : "") + "\"><a href=\"modules.html\">Modules</a></li>");
+		document.write("<li class=\"" + ((page == "Getting Started") ? "active" : "") + "\"><a href=\"getting-started.html\">Getting Started</a></li>");
+		document.write("</ul></div></div></div></div>");
+	}
+
+
+
+	<body data-spy="scroll" data-target=".bs-docs-sidebar">
+		<script>printNav("Home");</script>
+
+		<div class="jumbotron masthead">
+			<div class="container">
+				<img style="margin-bottom:30px;" src="img/sag-logo.png" />
+				<p>
+					<a href="https://github.com/willyg302/Sagittarius/zipball/master" class="btn btn-primary btn-large">ZIP Sagittarius Repo</a>
+				</p>
+				<ul class="masthead-links">
+					<li><a href="http://github.com/willyg302/Sagittarius">View on GitHub</a></li>
+					<li><a href="http://sagittarius-ogs.appspot.com/">Visit Site</a></li>
+					<li>Version 0.3</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="bs-docs-social">
+			<div class="container">
+				<ul class="bs-docs-social-buttons">
+					<li>
+						<iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=willyg302&repo=Sagittarius&type=watch&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="100px" height="20px"></iframe>
+					</li>
+					<li>
+						<iframe class="github-btn" src="http://ghbtns.com/github-btn.html?user=willyg302&repo=Sagittarius&type=fork&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="102px" height="20px"></iframe>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="container">
+			<section id="welcome">
+				<div class="page-header">
+					<h1>Welcome!</h1>
+				</div>
+				<p class="lead">Browse the table of contents below to get started, or use the quick-links bar above to jump to some of the more important pages. If you would like to download the source repo of Sagittarius, you can use the big blue button above to do so.</p>
+			</section>
+			<div class="marketing">
+				<div class="row-fluid">
+					<div class="span4">
+						<!--Image sizes are 600x290-->
+						<a href="downloads.html"><img class="marketing-img" src="img/index-download.png" /></a>
+						<h2>Downloads</h2>
+						<p>Grab the latest recommended version, a past stable release, or even the bleeding-edge version if you're feeling particularly dangerous.</p>
+					</div>
+					<div class="span4">
+						<a href="starter-kits.html"><img class="marketing-img" src="img/index-starter-kits.png" /></a>
+						<h2>Starter Kits</h2>
+						<p>Sagittarius offers a number of starter kits to jump-start your game backend. Just pick one in your favorite language and start coding!</p>
+					</div>
+					<div class="span4">
+						<a href="mixed-media.html"><img class="marketing-img" src="img/index-mixed-media.png" /></a>
+						<h2>Mixed Media</h2>
+						<p>Wallpapers, splash screens, intro videos, key sheets, logos in a variety of sizes, &ldquo;Powered By&rdquo; buttons, press and citation information, and more!</p>
+					</div>
+				</div>
+			</div>
+
+			<section id="table-of-contents">
+				<div class="page-header">
+					<h1>Table of Contents</h1>
+				</div>
+				<ul>
+					<li><a href="getting-started.html">Getting Started</a></li>
+					<li><a href="wizard.html">Sagittarius Wizard</a></li>
+					<li>Tutorial Hubs
+						<ul>
+							<li><a href="unrealscript.html">UnrealScript</a></li>
+							<li><a href="java.html">Java</a></li>
+							<li><a href="javascript.html">JavaScript</a></li>
+						</ul>
+					</li>
+					<li><a href="modules.html">Modules</a></li>
+				</ul>
+			</section>
+		</div>
+	</body>
+	</html>

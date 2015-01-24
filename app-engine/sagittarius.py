@@ -1,7 +1,10 @@
-#!/usr/local/bin/python
-# coding: utf-8
+import os
+import json
+import urllib
 
-import os, urllib, jinja2, webapp2, json
+import jinja2
+import webapp2
+
 from google.appengine.api import users, mail, app_identity
 from google.appengine.ext import ndb
 
@@ -11,7 +14,8 @@ from utils import DynamicPropertyMixin
 
 JINJA_ENVIRONMENT = jinja2.Environment(
 	loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-	extensions=['jinja2.ext.autoescape'])
+	extensions=['jinja2.ext.autoescape']
+)
 
 DEFAULT_DBOBJECT_TYPE = 'object'
 DEFAULT_DBOBJECT_NAME = 'null'
