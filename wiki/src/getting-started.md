@@ -22,7 +22,7 @@ Log into App Engine and create a new application through the dashboard. You can 
 
 ## Downloading Sagittarius
 
-Visit the [downloads page](../downloads) to get the recommended version of Sagittarius. Extract Sagittarius from its ZIP archive. You should see a directory structure much like the following:
+Visit the [downloads page](https://github.com/willyg302/Sagittarius/releases) to get the recommended version of Sagittarius. Extract Sagittarius from its ZIP archive. You should see a directory structure much like the following:
 
 ```
 Sagittarius-Dist/

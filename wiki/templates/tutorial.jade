@@ -1,21 +1,13 @@
-extends ./base.jade
+extends ./page.jade
 
-prepend head
-	- var pageTitle = title + " - " + defaultPageTitle
-
-block content
-	.doc-header
-		.container
-			h1= title
-			p= subtitle
-	.container
-		.row
-			.col-md-3#leftcol
-				ul.nav.nav-stacked.doc-sidenav#sidenav
-					each heading in headings
-						li: a(href="##{heading.id}")= heading.text
-			.col-md-9
-				!= contents
+block main
+	.row
+		.col-md-3#leftcol
+			ul.nav.nav-stacked.doc-sidenav#sidenav
+				each heading in headings
+					li: a(href="##{heading.id}")= heading.text
+		.col-md-9
+			!= contents
 
 append footer
 	script(type='text/javascript').

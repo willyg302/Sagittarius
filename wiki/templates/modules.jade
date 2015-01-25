@@ -1,0 +1,25 @@
+extends ./page.jade
+
+block main
+	table.table.table-bordered.modules-table
+		thead: tr
+			th
+			th UnrealScript
+			th Java
+			th JavaScript
+		tbody
+			tr
+				th(scope='row') Message of the Day
+				td: a(href='https://raw.githubusercontent.com/willyg302/Sagittarius/master/modules/unrealscript/MOTDModule.uc') Download!
+				td: a(href='https://raw.githubusercontent.com/willyg302/Sagittarius/master/modules/java/MOTDModule.java') Download!
+				td: a(href='https://raw.githubusercontent.com/willyg302/Sagittarius/master/modules/javascript/motdmodule.js') Download!
+			tr
+				th(scope='row') Server Browser
+				td: a(href='https://raw.githubusercontent.com/willyg302/Sagittarius/master/modules/unrealscript/ServerModule.uc') Download!
+				td Coming soon!
+				td Coming soon!
+			tr
+				th(scope='row') Leaderboards
+				td: a(href='https://raw.githubusercontent.com/willyg302/Sagittarius/master/modules/unrealscript/LeaderboardModule.uc') Download!
+				td: a(href='https://raw.githubusercontent.com/willyg302/Sagittarius/master/modules/java/LeaderboardModule.java') Download!
+				td Coming soon!

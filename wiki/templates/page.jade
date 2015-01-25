@@ -1,0 +1,12 @@
+extends ./base.jade
+
+prepend head
+	- var pageTitle = title + " - " + defaultPageTitle
+
+block content
+	.doc-header
+		.container
+			h1= title
+			p= subtitle
+	.container
+		block main

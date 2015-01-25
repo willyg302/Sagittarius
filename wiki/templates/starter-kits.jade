@@ -1,0 +1,15 @@
+extends ./page.jade
+
+block main
+	- var sks = [{'UnrealScript': 'unrealscript', 'Java': 'java', 'JavaScript': 'javascript'}]
+	each row in sks
+		.row
+			each v, k in row
+				.col-sm-6.col-md-3
+					.thumbnail
+						img(src=relative("/img/starter-kits/#{v}.png"))
+						.caption
+							h3= k
+							p
+								a.btn.btn-primary(href='#', role='button') Download
+								a.btn.btn-default(href=v, role='button') Docs
