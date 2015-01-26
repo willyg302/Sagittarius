@@ -6,6 +6,8 @@
   "devDependencies": {
     "gulp": "~3.8.10",
     "gulp-gh-pages": "~0.4.0",
-    "del": "~1.1.1"
+    "gulp-zip": "~2.0.2",
+    "del": "~1.1.1",
+    "merge-stream": "~0.1.7"
   }
 }

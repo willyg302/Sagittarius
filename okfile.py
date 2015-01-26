@@ -6,6 +6,8 @@ def build_wiki():
 		ok.node('build.js')
 	# Delete extra Metalsmith junk
 	ok.node('gulp wiki-post-clean', module=True)
+	# Add the downloads
+	ok.node('gulp wiki-zip-sks', module=True)
 
 def publish_wiki():
 	'''Publish the wiki to GitHub Pages'''
