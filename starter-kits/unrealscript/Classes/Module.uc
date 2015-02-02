@@ -1,6 +1,6 @@
 /**
  * Sagittarius - UnrealScript Starter Kit
- * Copyright 2013 WillyG Productions
+ * Copyright WillyG Productions
  * @Authors: William Gaul
  */
 class Module extends Object abstract;

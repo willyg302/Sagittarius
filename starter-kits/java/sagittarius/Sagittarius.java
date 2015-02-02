@@ -1,6 +1,6 @@
 /**
  * Sagittarius - Java Starter Kit
- * Copyright 2013 WillyG Productions
+ * Copyright WillyG Productions
  * @Authors: William Gaul
  */
 package sagittarius;

@@ -2,4 +2,4 @@
 
 ## Installation
 
-Visit [here](http://willyg302.github.io/Sagittarius/javascript) for installation instructions.
+Visit [here](http://willyg302.github.io/Sagittarius/starter-kits/javascript) for installation instructions.
