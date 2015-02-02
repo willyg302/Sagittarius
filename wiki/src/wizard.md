@@ -157,7 +157,7 @@ A saved recipe can be deleted by going to **File &rarr; Delete Recipe** (for saf
 
 # Global Options
 
-Before submitting a recipe, you must fill out the App ID and Password fields in the **Global Options** row. These values are the same as the values of `[APP ID HERE]` and `[APP PASSWORD HERE]` from your application's `app.yaml` file. For more information, see [here](http://localhost:8080/getting-started/#modifying-app-yaml).
+Before submitting a recipe, you must fill out the App ID and Password fields in the **Global Options** row. These values are the same as the values of `[APP ID HERE]` and `[APP PASSWORD HERE]` from your application's `app.yaml` file. For more information, see [here](../getting-started/#modifying-app-yaml).
 
 For convenience, these fields are saved every time you exit and will have their previous values the next time you run the wizard.
 

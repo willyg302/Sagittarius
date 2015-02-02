@@ -16,6 +16,7 @@ var paths = {
 		'./app/static/**/*.*',
 		'./app/templates/index.html',
 		'./app/encrypt.py',
+		'./app/README.md',
 		'./app/recipes.dat',
 		'./app/requirements.txt',
 		'./app/sagittarius-wizard.py'

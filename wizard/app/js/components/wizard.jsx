@@ -5,78 +5,21 @@ var React = require('react');
 var Button = require('react-bootstrap/Button');
 var ButtonToolbar = require('react-bootstrap/ButtonToolbar');
 var Input = require('react-bootstrap/Input');
-var OverlayTrigger = require('react-bootstrap/OverlayTrigger');
 var Panel = require('react-bootstrap/Panel');
-var Tooltip = require('react-bootstrap/Tooltip');
 
+var AppActions = require('../app-actions');
+var AppStore = require('../app-store');
 
-var buttons = [
-	{
-		name: 'filter',
-		desc: 'Add Filter'
-	},
-	{
-		name: 'project',
-		desc: 'Add Projection'
-	},
-	{
-		name: 'attribute',
-		desc: 'Add Attribute'
-	},
-	{
-		name: 'modification',
-		desc: 'Modify Attribute'
-	},
-	{
-		name: 'limit',
-		desc: 'Set Limit'
-	},
-	{
-		name: 'offset',
-		desc: 'Set Offset'
-	},
-	{
-		name: 'returns',
-		desc: 'Returns Results'
-	},
-	{
-		name: 'generic',
-		desc: 'Generic Parameter'
-	}
-];
-
-
-var Icon = React.createClass({
-	getDefaultProps: function() {
-		return {
-			position: 'top'
-		};
-	},
-	render: function() {
-		var tooltip = <Tooltip>{this.props.desc}</Tooltip>;
-		return (
-			<OverlayTrigger placement={this.props.position} overlay={tooltip}>
-				<a className={"icon " + this.props.name} onClick={this._onClick}>
-					<img src={"static/img/" + this.props.name + ".png"} />
-				</a>
-			</OverlayTrigger>
-		);
-	},
-	_onClick: function(e) {
-		e.preventDefault();
-		this.props.click();
-	}
-});
-
+var Action = require('./action.jsx');
+var AvailableButton = require('./available-button.jsx');
+var Icon = require('./icon.jsx');
+var WatchStoreMixin = require('./watch-store-mixin');
 
 var Wizard = React.createClass({
-	getInitialState: function() {
-		return {
-			id: '',
-			pass: ''
-		};
-	},
+	mixins: [WatchStoreMixin],
+
 	render: function() {
+		var available = AppStore.getAvailableButtons();
 		return (
 			<div>
 				<Panel header={<h3>Global Options</h3>}>
@@ -86,38 +29,40 @@ var Wizard = React.createClass({
 					</form>
 				</Panel>
 				<Panel header={<h3>Available Buttons</h3>}>
-					{buttons.map(function(button, i) {
-						return <Icon key={i} name={button.name} desc={button.desc} click={this._onSubmit} />;
-					}, this)}
+					{Object.keys(available).map(function(button) {
+						return <AvailableButton key={button} type={button} />;
+					})}
 				</Panel>
 				<Panel header={<h3>Recipe</h3>}>
-					<Icon name='dbadd' desc='Add' />
+					<Action action={this.state.action} />
+					{this.state.recipe.map(function(button, i) {
+						return <Icon key={i} name={button.type} desc='TODO' />;
+					})}
 					<ButtonToolbar className="recipe-menu">
 						<Button bsStyle="primary">Run</Button>
 						<Button>Save</Button>
 						<Button>Load</Button>
-						<Button>Clear</Button>
+						<Button onClick={this._onClear}>Clear</Button>
 						<Button>Delete</Button>
 					</ButtonToolbar>
 				</Panel>
 				<Panel header={<h3>Output</h3>}>
-					<div id="output" />
+					<div id="output">{JSON.stringify(this.state)}</div>
 				</Panel>
 			</div>
 		);
 	},
 	_onSetId: function() {
-		this.setState({
-			id: this.refs.id.getValue()
-		});
+		AppActions.changeId(this.refs.id.getValue());
 	},
 	_onSetPass: function() {
-		this.setState({
-			pass: this.refs.pass.getValue()
-		});
+		AppActions.changePass(this.refs.pass.getValue());
 	},
 	_onSubmit: function() {
 		//
+	},
+	_onClear: function() {
+		AppActions.clearRecipe();
 	}
 });
 
