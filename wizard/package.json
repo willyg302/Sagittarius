@@ -10,7 +10,8 @@
     "flux": "~2.0.1",
     "react": "~0.12.2",
     "react-bootstrap": "~0.13.3",
-    "react-tools": "~0.12.2"
+    "react-tools": "~0.12.2",
+    "request-json": "~0.5.0"
   },
   "devDependencies": {
     "gulp": "~3.8.10",

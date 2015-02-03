@@ -1,4 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
+var request = require('request-json');
 var merge = require('react/lib/merge');
 
 var AppDispatcher = require('./app-dispatcher');
@@ -6,6 +7,7 @@ var Constants = require('./constants');
 
 
 var CHANGE_EVENT = 'change';
+var client = request.newClient('http://localhost:8080/');
 
 var buttons = {
 	'filter': 'Add Filter',
@@ -31,8 +33,11 @@ var actions =  {
 var _state = {
 	id: '',
 	pass: '',
-	action: 'dbget',
-	recipe: []
+	recipe: {
+		name: 'Untitled',
+		action: 'dbget',
+		buttons: []
+	}
 };
 
 
@@ -44,18 +49,62 @@ function changePass(pass) {
 	_state.pass = pass;
 }
 
+function changeRecipeName(name) {
+	_state.recipe.name = name;
+}
+
 function setAction(action) {
-	_state.action = action;
+	_state.recipe.action = action;
 }
 
 function addButton(type) {
-	_state.recipe.push({
-		type: type
+	_state.recipe.buttons.push({
+		type: type,
+		enc: false
+	});
+}
+
+function removeButton(index) {
+	_state.recipe.buttons.splice(index, 1);
+}
+
+function updateButton(index, data) {
+	//
+}
+
+function runRecipe() {
+	if (!_state.id || !_state.pass || _state.recipe.buttons.length === 0) {
+		return;
+	}
+	client.post('run', {
+		data: _state.recipe,
+		id: _state.id,
+		pass: _state.pass
+	}, function(err, res, body) {
+		console.log(body);
+	});
+}
+
+function saveRecipe() {
+	client.post('recipe', {
+		action: 'save',
+		data: _state.recipe
+	}, function(err, res, body) {
+		console.log(body);
 	});
 }
 
 function clearRecipe() {
-	_state.recipe = [];
+	_state.recipe.buttons = [];
+}
+
+function deleteRecipe() {
+	client.post('recipe', {
+		action: 'delete',
+		data: _state.recipe
+	}, function(err, res, body) {
+		console.log(body);
+	});
 }
 
 
@@ -67,7 +116,34 @@ var AppStore = merge(EventEmitter.prototype, {
 		return actions;
 	},
 	getAvailableButtons: function() {
-		return buttons;  // @TODO
+		var l, o, r;
+		for (var i = 0; i < _state.recipe.buttons.length; i++) {
+			var e = _state.recipe.buttons[i].type;
+			l = l || (e === 'limit');
+			o = o || (e === 'offset');
+			r = r || (e === 'returns');
+		}
+		return Object.keys(buttons).filter(function(button) {
+			switch(button) {
+				case 'filter':
+				case 'project':
+					return ['dbget', 'dbmod', 'dbdel'].indexOf(_state.recipe.action) !== -1;
+				case 'attribute':
+					return _state.recipe.action === 'dbadd';
+				case 'modification':
+					return _state.recipe.action === 'dbmod';
+				case 'limit':
+					return !l && ['dbget', 'dbmod', 'dbdel'].indexOf(_state.recipe.action) !== -1;
+				case 'offset':
+					return !o && ['dbget', 'dbmod', 'dbdel'].indexOf(_state.recipe.action) !== -1;
+				case 'returns':
+					return !r && ['dbmod', 'dbdel'].indexOf(_state.recipe.action) !== -1;
+				case 'generic':
+					return ['dbget', 'dbadd', 'dbmod', 'dbdel'].indexOf(_state.recipe.action) === -1;
+				default:
+					return false;
+			}
+		});
 	},
 	getButtonDescription: function(type) {
 		return buttons[type];
@@ -94,6 +170,9 @@ AppDispatcher.register(function(payload) {
 		case Constants.OPTIONS_CHANGE_PASS:
 			changePass(action.pass);
 			break;
+		case Constants.RECIPE_CHANGE_NAME:
+			changeRecipeName(action.name);
+			break;
 		case Constants.RECIPE_SET_ACTION:
 			setAction(action.action);
 			break;
@@ -107,15 +186,19 @@ AppDispatcher.register(function(payload) {
 			updateButton(action.index, action.data);
 			break;
 		case Constants.RECIPE_RUN:
+			runRecipe();
 			break;
 		case Constants.RECIPE_SAVE:
+			saveRecipe();
 			break;
 		case Constants.RECIPE_LOAD:
+			// @TODO
 			break;
 		case Constants.RECIPE_CLEAR:
 			clearRecipe();
 			break;
 		case Constants.RECIPE_DELETE:
+			deleteRecipe();
 			break;
 		default:
 			return true;

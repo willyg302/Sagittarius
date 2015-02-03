@@ -13,13 +13,13 @@ var AppStore = require('../app-store');
 var Action = require('./action.jsx');
 var AvailableButton = require('./available-button.jsx');
 var Icon = require('./icon.jsx');
+var RecipeButton = require('./recipe-button.jsx');
 var WatchStoreMixin = require('./watch-store-mixin');
 
 var Wizard = React.createClass({
 	mixins: [WatchStoreMixin],
 
 	render: function() {
-		var available = AppStore.getAvailableButtons();
 		return (
 			<div>
 				<Panel header={<h3>Global Options</h3>}>
@@ -29,21 +29,22 @@ var Wizard = React.createClass({
 					</form>
 				</Panel>
 				<Panel header={<h3>Available Buttons</h3>}>
-					{Object.keys(available).map(function(button) {
+					{AppStore.getAvailableButtons().map(function(button) {
 						return <AvailableButton key={button} type={button} />;
 					})}
 				</Panel>
-				<Panel header={<h3>Recipe</h3>}>
-					<Action action={this.state.action} />
-					{this.state.recipe.map(function(button, i) {
-						return <Icon key={i} name={button.type} desc='TODO' />;
+				<Panel header={<h3>Recipe: <input className="recipe-name" type="text" ref="recipe"
+				                                  value={this.state.recipe.name} onChange={this._onSetRecipeName} /></h3>}>
+					<Action action={this.state.recipe.action} />
+					{this.state.recipe.buttons.map(function(button, i) {
+						return <RecipeButton key={i} type={button.type} index={i} />;
 					})}
 					<ButtonToolbar className="recipe-menu">
-						<Button bsStyle="primary">Run</Button>
-						<Button>Save</Button>
-						<Button>Load</Button>
+						<Button bsStyle="primary" onClick={this._onRun}>Run</Button>
+						<Button onClick={this._onSave}>Save</Button>
+						<Button onClick={this._onLoad}>Load</Button>
 						<Button onClick={this._onClear}>Clear</Button>
-						<Button>Delete</Button>
+						<Button onClick={this._onDelete}>Delete</Button>
 					</ButtonToolbar>
 				</Panel>
 				<Panel header={<h3>Output</h3>}>
@@ -58,11 +59,23 @@ var Wizard = React.createClass({
 	_onSetPass: function() {
 		AppActions.changePass(this.refs.pass.getValue());
 	},
-	_onSubmit: function() {
-		//
+	_onSetRecipeName: function() {
+		AppActions.changeRecipeName(this.refs.recipe.getDOMNode().value);
+	},
+	_onRun: function() {
+		AppActions.runRecipe();
+	},
+	_onSave: function() {
+		AppActions.saveRecipe();
+	},
+	_onLoad: function() {
+		AppActions.loadRecipe();
 	},
 	_onClear: function() {
 		AppActions.clearRecipe();
+	},
+	_onDelete: function() {
+		AppActions.deleteRecipe();
 	}
 });
 

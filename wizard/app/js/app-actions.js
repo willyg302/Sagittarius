@@ -15,6 +15,12 @@ var AppActions = {
 			pass: pass
 		});
 	},
+	changeRecipeName: function(name) {
+		AppDispatcher.handleViewAction({
+			actionType: Constants.RECIPE_CHANGE_NAME,
+			name: name
+		});
+	},
 	setAction: function(action) {
 		AppDispatcher.handleViewAction({
 			actionType: Constants.RECIPE_SET_ACTION,
@@ -40,38 +46,31 @@ var AppActions = {
 			data: data
 		});
 	},
-	clearRecipe: function() {
-		AppDispatcher.handleViewAction({
-			actionType: Constants.RECIPE_CLEAR
-		});
-	}
-	/*
-	: function() {
+	runRecipe: function() {
 		AppDispatcher.handleViewAction({
 			actionType: Constants.RECIPE_RUN
 		});
 	},
-	: function() {
+	saveRecipe: function() {
 		AppDispatcher.handleViewAction({
 			actionType: Constants.RECIPE_SAVE
 		});
 	},
-	: function() {
+	loadRecipe: function() {
 		AppDispatcher.handleViewAction({
 			actionType: Constants.RECIPE_LOAD
 		});
 	},
-	: function() {
+	clearRecipe: function() {
 		AppDispatcher.handleViewAction({
 			actionType: Constants.RECIPE_CLEAR
 		});
 	},
-	: function() {
+	deleteRecipe: function() {
 		AppDispatcher.handleViewAction({
 			actionType: Constants.RECIPE_DELETE
 		});
 	}
-	*/
 };
 
 module.exports = AppActions;
