@@ -3,9 +3,10 @@ A helper wizard for the Sagittarius Online Game Service.
 Copyright: (c) 2015 William Gaul
 License: MIT, see LICENSE for more details
 '''
-import httplib, urllib, json
+import os, httplib, urllib, json
 
-from flask import Flask, render_template, request
+from tornado import ioloop, web
+from sockjs.tornado import SockJSConnection, SockJSRouter
 
 import encrypt
 
@@ -28,7 +29,7 @@ def dump_data(data):
 # HANDLERS
 ########################################
 
-def run_recipe(recipe, id, password):
+def run_recipe(sock, recipe, id, password, **kwargs):
 	headers = {
 		'Content-type': 'application/x-www-form-urlencoded',
 		'Accept': 'text/plain'
@@ -45,7 +46,8 @@ def run_recipe(recipe, id, password):
 
 	params = '&'.join([get_button_param(b) for b in recipe['buttons']])
 
-	print handle, params
+	sock.send('Submitting to {}{}'.format(id, handle))
+	sock.send('URL String: {}'.format(params))
 
 	# Initialize connection!
 	conn = httplib.HTTPConnection(id + ".appspot.com:80")
@@ -58,46 +60,48 @@ def run_recipe(recipe, id, password):
 		parsed = ''
 		for part in json.JSONEncoder().iterencode(json.loads(resp)):
 			parsed += ('"{}"'.format(encrypt.decrypt(part[1:-1], password)) if part.startswith('"~') else part)
-		return parsed
+		sock.send('Received data:\n{}'.format(json.dumps(json.loads(parsed), indent=4)))
 	except (ValueError, KeyError, TypeError):
-		return json.dumps({})
+		sock.send('Error running recipe')
 
-def save_recipe(recipe):
+def save_recipe(sock, recipe, **kwargs):
+	name = recipe['name']
 	recipes = load_data()
-	recipes[recipe['name']] = recipe
+	recipes[name] = recipe
 	dump_data(recipes)
-	return True
+	sock.send('Successfully saved recipe {}'.format(name))
 
-def delete_recipe(recipe):
+def delete_recipe(sock, recipe, **kwargs):
+	name = recipe['name']
 	recipes = load_data()
-	del recipes[recipe['name']]
+	del recipes[name]
 	dump_data(recipes)
-	return True
+	sock.send('Successfully deleted recipe {}'.format(name))
 
 
 ########################################
 # MAIN APP
 ########################################
 
-app = Flask(__name__)
+class IndexHandler(web.RequestHandler):
+	def get(self):
+		self.render('index.html')
 
-@app.route('/')
-def main():
-	return render_template('index.html')
 
-@app.route('/run', methods=['POST'])
-def run():
-	req = request.get_json()
-	return run_recipe(req['data'], req['id'], req['pass'])
-
-@app.route('/recipe', methods=['POST'])
-def recipe():
-	req = request.get_json()
-	return {
-		'save': save_recipe,
-		'delete': delete_recipe
-	}[req['action']](req['data'])
+class SockConnection(SockJSConnection):
+	def on_message(self, message):
+		payload = json.loads(message)
+		{
+			'run': run_recipe,
+			'save': save_recipe,
+			'delete': delete_recipe
+		}[payload['endpoint']](self, **payload)
 
 
 if __name__ == '__main__':
-	app.run(port=8080)
+	TodoRouter = SockJSRouter(SockConnection, '/sock')
+	web.Application([
+		(r'/', IndexHandler),
+		(r'/static/(.*)', web.StaticFileHandler, {'path': os.path.dirname(__file__)})
+	] + TodoRouter.urls).listen(8080)
+	ioloop.IOLoop.instance().start()

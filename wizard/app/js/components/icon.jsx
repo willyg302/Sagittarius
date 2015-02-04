@@ -16,7 +16,7 @@ var Icon = React.createClass({
 		return (
 			<OverlayTrigger placement={this.props.position} overlay={tooltip}>
 				<a className={"icon " + this.props.name} onClick={this._onClick}>
-					<img src={"static/img/" + this.props.name + ".png"} />
+					<img src={"/static/img/" + this.props.name + ".png"} />
 				</a>
 			</OverlayTrigger>
 		);

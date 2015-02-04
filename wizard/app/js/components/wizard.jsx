@@ -47,9 +47,6 @@ var Wizard = React.createClass({
 						<Button onClick={this._onDelete}>Delete</Button>
 					</ButtonToolbar>
 				</Panel>
-				<Panel header={<h3>Output</h3>}>
-					<div id="output">{JSON.stringify(this.state)}</div>
-				</Panel>
 			</div>
 		);
 	},

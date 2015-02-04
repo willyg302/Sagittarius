@@ -1,5 +1,5 @@
 var EventEmitter = require('events').EventEmitter;
-var request = require('request-json');
+var SockJS = require('sockjs-client');
 var merge = require('react/lib/merge');
 
 var AppDispatcher = require('./app-dispatcher');
@@ -7,7 +7,19 @@ var Constants = require('./constants');
 
 
 var CHANGE_EVENT = 'change';
-var client = request.newClient('http://localhost:8080/');
+
+var sock = new SockJS('http://localhost:8080/sock');
+
+sock.onmessage = function(e) {
+	var message = e.data;
+	var output = document.getElementById('output');
+	output.innerHTML = "<p>" + message.replace(new RegExp('\n', 'g'), '<br>') + "</p>" + output.innerHTML;
+};
+
+var send = function(message) {
+	sock.send(JSON.stringify(message));
+};
+
 
 var buttons = {
 	'filter': 'Add Filter',
@@ -76,21 +88,18 @@ function runRecipe() {
 	if (!_state.id || !_state.pass || _state.recipe.buttons.length === 0) {
 		return;
 	}
-	client.post('run', {
-		data: _state.recipe,
+	send({
+		endpoint: 'run',
+		recipe: _state.recipe,
 		id: _state.id,
-		pass: _state.pass
-	}, function(err, res, body) {
-		console.log(body);
+		password: _state.pass
 	});
 }
 
 function saveRecipe() {
-	client.post('recipe', {
-		action: 'save',
-		data: _state.recipe
-	}, function(err, res, body) {
-		console.log(body);
+	send({
+		endpoint: 'save',
+		recipe: _state.recipe
 	});
 }
 
@@ -99,11 +108,9 @@ function clearRecipe() {
 }
 
 function deleteRecipe() {
-	client.post('recipe', {
-		action: 'delete',
-		data: _state.recipe
-	}, function(err, res, body) {
-		console.log(body);
+	send({
+		endpoint: 'delete',
+		recipe: _state.recipe
 	});
 }
 
