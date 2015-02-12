@@ -11,9 +11,10 @@ var CHANGE_EVENT = 'change';
 var sock = new SockJS('http://localhost:8080/sock');
 
 sock.onmessage = function(e) {
-	var message = e.data;
+	var payload = JSON.parse(e.data);
+	var message = payload.message.replace(new RegExp('\n', 'g'), '<br>');
 	var output = document.getElementById('output');
-	output.innerHTML = "<p>" + message.replace(new RegExp('\n', 'g'), '<br>') + "</p>" + output.innerHTML;
+	output.innerHTML = "<p" + (payload.error ? ' class="error"' : '') + ">" + message + "</p>" + output.innerHTML;
 };
 
 var send = function(message) {
@@ -72,7 +73,9 @@ function setAction(action) {
 function addButton(type) {
 	_state.recipe.buttons.push({
 		type: type,
-		enc: false
+		enc: false,
+		key: '',
+		val: ''
 	});
 }
 

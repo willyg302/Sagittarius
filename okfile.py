@@ -36,10 +36,9 @@ def build_wizard():
 	with ok.root('wizard'):
 		ok.node('gulp', module=True)
 	# Kick off install of build if needed
-	if not os.path.isdir('wizard/dist/env'):
+	if not os.path.isdir('wizard/dist/node_modules'):
 		with ok.root('wizard/dist'):
-			with ok.virtualenv('env'):
-				ok.pip('install -r requirements.txt')
+			ok.npm('install')
 
 def test_wizard():
 	'''Test the wizard'''
@@ -52,8 +51,7 @@ def test_wizard():
 def serve_wizard():
 	'''Serve the wizard locally'''
 	with ok.root('wizard/dist'):
-		with ok.virtualenv('env'):
-			ok.run('python sagittarius-wizard.py')
+		ok.node('index.js')
 
 
 ########################################

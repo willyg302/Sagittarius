@@ -46,8 +46,8 @@ def run_recipe(sock, recipe, id, password, **kwargs):
 
 	params = '&'.join([get_button_param(b) for b in recipe['buttons']])
 
-	sock.send('Submitting to {}{}'.format(id, handle))
-	sock.send('URL String: {}'.format(params))
+	sock.out('Submitting to {}{}'.format(id, handle))
+	sock.out('URL String: {}'.format(params))
 
 	# Initialize connection!
 	conn = httplib.HTTPConnection(id + ".appspot.com:80")
@@ -60,23 +60,26 @@ def run_recipe(sock, recipe, id, password, **kwargs):
 		parsed = ''
 		for part in json.JSONEncoder().iterencode(json.loads(resp)):
 			parsed += ('"{}"'.format(encrypt.decrypt(part[1:-1], password)) if part.startswith('"~') else part)
-		sock.send('Received data:\n{}'.format(json.dumps(json.loads(parsed), indent=4)))
+		sock.out('Received data:\n{}'.format(json.dumps(json.loads(parsed), indent=4)))
 	except (ValueError, KeyError, TypeError):
-		sock.send('Error running recipe')
+		sock.err('Error running recipe')
 
 def save_recipe(sock, recipe, **kwargs):
 	name = recipe['name']
 	recipes = load_data()
 	recipes[name] = recipe
 	dump_data(recipes)
-	sock.send('Successfully saved recipe {}'.format(name))
+	sock.out('Successfully saved recipe "{}"'.format(name))
 
 def delete_recipe(sock, recipe, **kwargs):
 	name = recipe['name']
 	recipes = load_data()
-	del recipes[name]
-	dump_data(recipes)
-	sock.send('Successfully deleted recipe {}'.format(name))
+	if name in recipes:
+		del recipes[name]
+		dump_data(recipes)
+		sock.out('Successfully deleted recipe "{}"'.format(name))
+	else:
+		sock.err('No recipe named "{}" has been saved'.format(name))
 
 
 ########################################
@@ -89,6 +92,7 @@ class IndexHandler(web.RequestHandler):
 
 
 class SockConnection(SockJSConnection):
+
 	def on_message(self, message):
 		payload = json.loads(message)
 		{
@@ -96,6 +100,18 @@ class SockConnection(SockJSConnection):
 			'save': save_recipe,
 			'delete': delete_recipe
 		}[payload['endpoint']](self, **payload)
+
+	def out(self, message):
+		self.send(json.dumps({
+			'message': message,
+			'error': False
+		}))
+
+	def err(self, message):
+		self.send(json.dumps({
+			'message': message,
+			'error': True
+		}))
 
 
 if __name__ == '__main__':

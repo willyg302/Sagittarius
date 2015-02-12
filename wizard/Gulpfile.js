@@ -14,15 +14,14 @@ var paths = {
 	assets: [
 		'./app/img/**/*.*',
 		'./app/index.html',
-		'./app/encrypt.py',
+		'./app/index.js',
+		'./app/package.json',
 		'./app/README.md',
-		'./app/recipes.dat',
-		'./app/requirements.txt',
-		'./app/sagittarius-wizard.py'
+		'./app/recipes.dat'
 	],
 	app: './app',
 	dist: './dist',
-	package: ['./dist/**/*.*', '!./dist/env/**/*.*'],
+	package: ['./dist/**/*.*', '!./dist/node_modules/**/*.*'],
 	css: './app/less/main.less',
 	js: './app/js/app.js'
 };
