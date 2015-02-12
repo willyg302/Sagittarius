@@ -5,6 +5,8 @@
   "private": true,
   "dependencies": {
     "express": "^4.11.2",
+    "jsonfile": "^2.0.0",
+    "request": "^2.53.0",
     "sockjs": "^0.3.12"
   }
 }
