@@ -3,7 +3,7 @@
  * Copyright WillyG Productions
  * @Authors: William Gaul
  */
-package sagittarius;
+package com.willyg.sagittarius;
 
 import java.util.ArrayList;
 import org.json.simple.JSONArray;
@@ -11,29 +11,29 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 public class SagResponse {
-    
+
     private JSONObject response;
     private boolean wasSuccessful;
     private String errorMsg;
-    
+
     public SagResponse(String text) {
         this.response = (JSONObject) JSONValue.parse(text);
         this.wasSuccessful = response.get("success").equals("y");
         this.errorMsg = (String) response.get("success");
     }
-    
+
     public boolean wasSuccessful() {
         return wasSuccessful;
     }
-    
+
     public String getErrorMessage() {
         return errorMsg;
     }
-    
+
     public JSONObject getResponseObject() {
         return response;
     }
-    
+
     public String getDBValue(String key) {
         JSONArray DBObjects = (JSONArray) response.get("dbobjects");
         if (DBObjects == null) {
@@ -48,7 +48,7 @@ public class SagResponse {
         }
         return ret;
     }
-    
+
     public ArrayList<String> getDBValues(String key) {
         JSONArray DBObjects = (JSONArray) response.get("dbobjects");
         ArrayList<String> ret = new ArrayList<String>();
@@ -64,7 +64,7 @@ public class SagResponse {
         }
         return ret;
     }
-    
+
     public ArrayList<Object> getDBObjects() {
         return (JSONArray) response.get("dbobjects");
     }

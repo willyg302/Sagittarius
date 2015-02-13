@@ -3,7 +3,7 @@
  * Copyright WillyG Productions
  * @Authors: William Gaul
  */
-package sagittarius;
+package com.willyg.sagittarius;
 
 public abstract class Module {
 
@@ -16,6 +16,6 @@ public abstract class Module {
     protected void SubmitAction(String QueryID, Action a) {
         a.submit(ID, QueryID);
     }
-    
+
     public abstract void OnResponseReceived(String ActionID, SagResponse resp);
 }

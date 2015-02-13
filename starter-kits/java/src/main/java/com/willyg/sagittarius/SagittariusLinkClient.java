@@ -3,7 +3,7 @@
  * Copyright WillyG Productions
  * @Authors: William Gaul
  */
-package sagittarius;
+package com.willyg.sagittarius;
 
 import java.util.ArrayList;
 import com.ning.http.client.*;
@@ -16,7 +16,7 @@ public class SagittariusLinkClient {
     private String TargetHost;
     private boolean isBusy;
     private AsyncHttpClient ahc;
-    
+
     private ArrayList<SagRequest> requestQueue;
     private SagRequest currentRequest;
 
@@ -53,13 +53,13 @@ public class SagittariusLinkClient {
             Sagittarius.LogError("Connection error (is server running at " + currentRequest.getDestination() + "?): " + ex.getMessage());
         }
     }
-    
+
     private void asyncPost() throws IOException {
         BoundRequestBuilder brb = ahc.preparePost(TargetHost + currentRequest.getDestination());
         String[] params = currentRequest.getData().split("&");
         for (String s : params) {
             String[] parts = s.split("=");
-            brb.addParameter(parts[0], parts[1]);
+            brb.addFormParam(parts[0], parts[1]);
         }
         brb.execute(new AsyncHandler<String>() {
             private ByteArrayOutputStream bytes = new ByteArrayOutputStream();
@@ -97,13 +97,13 @@ public class SagittariusLinkClient {
                 String ret = bytes.toString();
                 Sagittarius.LogDebug("Sent text: " + currentRequest.getData() + " to destination " + currentRequest.getDestination());
                 Sagittarius.LogDebug("End TCP connection");
-                
+
                 // If nothing has been returned, we know an error has occurred
                 if (ret == null || ret.equals("")) {
                     ret = "{\"success\":\"" + error + "\"}";
                 }
                 Sagittarius.LogDebug("Received Text: " + ret);
-                
+
                 // In any case, our connection is done
                 Sagittarius.LogInfo("TCP connection closed for module " + currentRequest.getModuleID() + " and query " + currentRequest.getQueryID());
                 Sagittarius.getInstance().OnResponseReceived(currentRequest.getModuleID(), currentRequest.getQueryID(), new SagResponse(ret));

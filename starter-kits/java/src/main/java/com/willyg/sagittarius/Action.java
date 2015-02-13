@@ -3,7 +3,7 @@
  * Copyright WillyG Productions
  * @Authors: William Gaul
  */
-package sagittarius;
+package com.willyg.sagittarius;
 
 public class Action {
 
@@ -14,20 +14,19 @@ public class Action {
     private static final int LIMIT = 0x10;
     private static final int OFFSET = 0x20;
     private static final int RETURNS = 0x40;
-    
+
     private static final int GET = FILTER + PROJECT + LIMIT + OFFSET;
     private static final int ADD = ADD_ATTR;
     private static final int DEL = GET + RETURNS;
     private static final int MOD = DEL + MOD_ATTR;
 
     public enum ActionType {
-
         GET, ADD, MOD, DEL
     }
-    
+
     public static final String DBTYPE = "object_type";
     public static final String DBNAME = "object_name";
-    
+
     private String handler;
     private int actionType;
     private SagRequest request;
@@ -42,7 +41,7 @@ public class Action {
         this.resultOffset = 0;
         this.returnsResults = false;
     }
-    
+
     private boolean check(int checkVal) {
         boolean ret = ((actionType & checkVal) == checkVal);
         if (!ret) {

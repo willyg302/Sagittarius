@@ -22,7 +22,11 @@ var paths = {
 		__dirname + '/wiki/build/wizard/less'
 	],
 	sks: {
-		all: ['java', 'javascript', 'unrealscript'],
+		all: {
+			java: ['README.md', 'target/sagittarius-0.4.0.jar'],
+			javascript: ['/**/*'],
+			unrealscript: ['/**/*']
+		},
 		src: __dirname + '/starter-kits',
 		dest: __dirname + '/wiki/build/starter-kits'
 	}
@@ -38,8 +42,11 @@ gulp.task('wiki-post-clean', function(cb) {
 });
 
 gulp.task('wiki-zip-sks', function() {
-	var tasks = paths.sks.all.map(function(sk) {
-		return gulp.src(path.join(paths.sks.src, sk, '/**/*'))
+	var tasks = Object.keys(paths.sks.all).map(function(sk) {
+		var files = paths.sks.all[sk].map(function(file) {
+			return path.join(paths.sks.src, sk, file);
+		});
+		return gulp.src(files)
 			.pipe(zip("sagittarius-" + sk + ".zip"))
 			.pipe(gulp.dest(path.join(paths.sks.dest, sk)));
 	});

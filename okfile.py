@@ -4,6 +4,15 @@ project = 'Sagittarius'
 
 
 ########################################
+# STARTER KITS
+########################################
+
+def build_sk_java():
+	with ok.root('starter-kits/java'):
+		ok.maven('compile').maven('package')
+
+
+########################################
 # WIKI
 ########################################
 

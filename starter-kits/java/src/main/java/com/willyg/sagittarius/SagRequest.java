@@ -3,7 +3,7 @@
  * Copyright WillyG Productions
  * @Authors: William Gaul
  */
-package sagittarius;
+package com.willyg.sagittarius;
 
 public class SagRequest {
 
@@ -14,11 +14,11 @@ public class SagRequest {
         this.data = "";
         this.delim = "";
     }
-    
+
     public void submit() {
         Sagittarius.getInstance().SubmitRequest(this);
     }
-    
+
     public void addURLPair(String param, String value, boolean encryptValue) {
         if (encryptValue) {
             value = Sagittarius.getInstance().encrypt(value);
@@ -26,12 +26,12 @@ public class SagRequest {
         this.data += (delim + param + "=" + value);
         this.delim = "&";
     }
-    
+
     public SagRequest setDestination(String dest) {
         this.dest = dest;
         return this;
     }
-    
+
     public SagRequest setModuleInfo(String mID, String qID) {
         this.mID = mID;
         this.qID = qID;

@@ -3,7 +3,7 @@
  * Copyright WillyG Productions
  * @Authors: William Gaul
  */
-package sagittarius;
+package com.willyg.sagittarius;
 
 import java.util.HashMap;
 import java.io.PrintStream;
@@ -17,11 +17,10 @@ public class Sagittarius {
     private static final String LOG_TAG = "Sagittarius";
 
     public enum ELogLevel {
-
         LOG_None, LOG_Error, LOG_Warn, LOG_Info, LOG_Debug;
     }
     private static ELogLevel logLevel = ELogLevel.LOG_Debug;
-    
+
     private Sagittarius() {
         // Private for singleton model
         this.link = null;
@@ -37,11 +36,11 @@ public class Sagittarius {
     private static class SagittariusHolder {
         public static final Sagittarius INSTANCE = new Sagittarius();
     }
-    
+
     public static Sagittarius getInstance() {
         return SagittariusHolder.INSTANCE;
     }
-    
+
     public void Initialize(String AppID, String Pass) {
         this.link = new SagittariusLinkClient(AppID);
         this.SagPass = Pass;
@@ -58,7 +57,7 @@ public class Sagittarius {
         }
         return ret;
     }
-    
+
     public void SubmitRequest(SagRequest sr) {
         if (link == null) {
             LogError("SubmitRequest() - did you forget to initialize Sagittarius?");
@@ -77,7 +76,7 @@ public class Sagittarius {
         }
         GetModule(ModuleID).OnResponseReceived(ActionID, resp);
     }
-    
+
     private void BuiltInOnResponseReceived(String ActionID, SagResponse resp) {
         // @TODO: Make more robust
         if (ActionID.equals("mail")) {
@@ -153,7 +152,7 @@ public class Sagittarius {
             log(msg, cat, "DEBUG");
         }
     }
-    
+
     public String encrypt(String pt) {
         return Encryption.Encrypt(pt, SagPass);
     }
