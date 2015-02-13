@@ -1,8 +1,8 @@
-import sagittarius.GetAction;
-import sagittarius.Handler;
-import sagittarius.Module;
-import sagittarius.SagResponse;
-import sagittarius.Sagittarius;
+import com.willyg.sagittarius.GetAction;
+import com.willyg.sagittarius.Handler;
+import com.willyg.sagittarius.Module;
+import com.willyg.sagittarius.SagResponse;
+import com.willyg.sagittarius.Sagittarius;
 
 
 public class MOTDModule extends Module {

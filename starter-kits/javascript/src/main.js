@@ -4,12 +4,14 @@
  * @Authors: William Gaul
  */
 var actions = require('./actions');
+var encryption = require('./encryption');
 var request = require('superagent');
 var SagRequest = require('./sag-request');
 
 function Sagittarius(appid, pass) {
 	this.appid = appid;
 	this.pass = pass;
+	this.encryption = encryption;
 }
 
 Sagittarius.prototype.createAction = function(type) {
@@ -39,11 +41,10 @@ Sagittarius.prototype.transmit = function(req, callback) {
 		.send(req.getData())
 		.end(function(res) {
 			if (!res.ok) {
-				// @TODO handle error
-				return;
+				callback(res.error.message, true);
 			}
 			// @TODO: Decryption
-			callback(res.body);
+			callback(res.body, false);
 		});
 };
 

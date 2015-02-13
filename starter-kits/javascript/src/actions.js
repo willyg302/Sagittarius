@@ -20,27 +20,27 @@ actions.GetAction = function(password) {
 	that.request.addURLPair('rlim', 20);
 	that.request.addURLPair('roff', 0);
 
-	that.AddFilter = function(field, value, encrypt) {
+	that.addFilter = function(field, value, encrypt) {
 		that.request.addURLPair('f', field + '::' + value, encrypt);
 		return that;
 	};
 
-	that.AddProjection = function(field, encrypt) {
+	that.addProjection = function(field, encrypt) {
 		that.request.addURLPair('p', field + (encrypt !== undefined ? '~' : ''));
 		return that;
 	};
 
-	that.SetLimit = function(rl) {
+	that.setLimit = function(rl) {
 		that.request.setURLPair('rlim', rl);
 		return that;
 	};
 
-	that.SetOffset = function(ro) {
+	that.setOffset = function(ro) {
 		that.request.setURLPair('roff', ro);
 		return that;
 	};
 
-	that.Unique = function() {
+	that.unique = function() {
 		that.request.setURLPair('rlim', 1);
 		return that;
 	};
@@ -51,7 +51,7 @@ actions.GetAction = function(password) {
 actions.AddAction = function(password) {
 	var that = this.Action('/dbadd', password);
 
-	that.AddAttribute = function(field, value, encrypt) {
+	that.addAttribute = function(field, value, encrypt) {
 		that.request.addURLPair('a', field + '::' + value, encrypt);
 		return that;
 	};
@@ -64,7 +64,7 @@ actions.DelAction = function(password) {
 	that.request.setDestination('/dbdel');
 	that.request.addURLPair('rres', false);
 
-	that.SetReturnsResults = function() {
+	that.setReturnsResults = function() {
 		that.request.setURLPair('rres', true);
 		return that;
 	};
@@ -76,7 +76,7 @@ actions.ModAction = function(password) {
 	var that = this.DelAction(password);
 	that.request.setDestination('/dbmod');
 
-	that.AddModification = function(field, value, encrypt) {
+	that.addModification = function(field, value, encrypt) {
 		that.request.addURLPair('m', field + '::' + value, encrypt);
 		return that;
 	};

@@ -14,14 +14,18 @@ var CHANGE_EVENT = 'change';
 var sock = new SockJS('http://localhost:8080/sock');
 
 sock.onmessage = function(e) {
-	var payload = JSON.parse(e.data);
-	var message = payload.message.replace(new RegExp('\n', 'g'), '<br>');
-	var output = document.getElementById('output');
-	output.innerHTML = "<p" + (payload.error ? ' class="error"' : '') + ">" + message + "</p>" + output.innerHTML;
+	receive(JSON.parse(e.data));
 };
 
 var send = function(message) {
 	sock.send(JSON.stringify(message));
+};
+
+var receive = function(payload) {
+	var message = payload.message.replace(new RegExp('\n', 'g'), '<br>');
+	var output = document.getElementById('output');
+	var cls = (payload.error ? ' class="error"' : '');
+	output.innerHTML = "<p" + cls + ">" + message + "</p>" + output.innerHTML;
 };
 
 
@@ -94,12 +98,64 @@ function runRecipe() {
 	if (!_state.id || !_state.pass || _state.recipe.buttons.length === 0) {
 		return;
 	}
-	send({
-		endpoint: 'run',
-		recipe: _state.recipe,
-		id: _state.id,
-		password: _state.pass
+	var sag = new Sagittarius(_state.id, _state.pass);
+
+
+
+
+
+	
+
+
+
+
+/*
+var runRecipe = function(conn, recipe, id, password) {
+	var handle = "/" + recipe.action;
+	var params = {};
+	recipe.buttons.forEach(function(button) {
+		if (button.type === 'returns') {
+			params.rres = true;
+		} else {
+			var val = button.val;
+			if (button.enc) {
+				val = encryption.encrypt(val, password);
+			}
+			params[button.key] = val;
+		}
 	});
+
+	conn.out("Submitting to " + id + handle + " with params " + JSON.stringify(params));
+
+	// Initialize connection!
+	request.post({
+		url: "http://" + id + ".appspot.com" + handle,
+		form: params
+	}, function(err, resp, body) {
+		if (err) {
+			conn.err("Error running recipe:\n" + err);
+			return;
+		}
+		// @TODO: Decryption
+		conn.out("Received data:\n" + body);
+	});
+};*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 function saveRecipe() {
