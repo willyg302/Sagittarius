@@ -1,0 +1,16 @@
+{
+  "name": "sagittarius-sk-javascript",
+  "version": "0.4.0",
+  "author": "William Gaul",
+  "private": true,
+  "scripts": {
+    "build": "browserify src/main.js --s Sagittarius | uglifyjs -c > sagittarius.min.js"
+  },
+  "dependencies": {
+    "superagent": "^0.21.0"
+  },
+  "devDependencies": {
+    "browserify": "^8.1.3",
+    "uglify-js": "^2.4.16"
+  }
+}

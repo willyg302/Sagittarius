@@ -5,6 +5,9 @@ var merge = require('react/lib/merge');
 var AppDispatcher = require('./app-dispatcher');
 var Constants = require('./constants');
 
+// This is horrible, but avoids having duplicate code or symlinks
+var Sagittarius = require('../../../starter-kits/javascript/src/main');
+
 
 var CHANGE_EVENT = 'change';
 

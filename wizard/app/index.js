@@ -70,7 +70,7 @@ var runRecipe = function(conn, recipe, id, password) {
 	request.post({
 		url: "http://" + id + ".appspot.com" + handle,
 		form: params
-	}, function(err, httpResponse, body) {
+	}, function(err, resp, body) {
 		if (err) {
 			conn.err("Error running recipe:\n" + err);
 			return;

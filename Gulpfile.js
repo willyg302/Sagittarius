@@ -24,7 +24,7 @@ var paths = {
 	sks: {
 		all: {
 			java: ['README.md', 'target/sagittarius-0.4.0.jar'],
-			javascript: ['/**/*'],
+			javascript: ['README.md', 'sagittarius.min.js'],
 			unrealscript: ['/**/*']
 		},
 		src: __dirname + '/starter-kits',

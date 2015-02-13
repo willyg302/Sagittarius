@@ -11,6 +11,10 @@ def build_sk_java():
 	with ok.root('starter-kits/java'):
 		ok.maven('compile').maven('package')
 
+def build_sk_javascript():
+	with ok.root('starter-kits/javascript'):
+		ok.npm('run build')
+
 
 ########################################
 # WIKI
@@ -70,6 +74,9 @@ def serve_wizard():
 def install():
 	# Base stuff for Gulp
 	ok.npm('install')
+	# JavaScript starter kit
+	with ok.root('starter-kits/javascript'):
+		ok.npm('install')
 	# Metalsmith and additional stuff for wiki
 	with ok.root('wiki'):
 		ok.npm('install')
